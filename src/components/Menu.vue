@@ -104,7 +104,6 @@
         </div>
       </nav>
 
-      <!-- 🔑 Logout -->
       <div
         v-if="usuarioRegistrado"
         class="p-4 border-t border-slate-400 border-dashed"

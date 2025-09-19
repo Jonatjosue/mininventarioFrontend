@@ -33,12 +33,6 @@
               </p>
             </div>
           </div>
-          <div class="flex items-center space-x-2">
-            <span
-              class="hidden md:inline-block h-2 w-2 rounded-full bg-green-500 animate-pulse"
-            ></span>
-            <span class="text-xs text-green-600 font-medium">Conectado</span>
-          </div>
         </div>
       </div>
     </header>
@@ -47,7 +41,34 @@
     <main class="max-w-7xl mx-auto">
       <div class="bg-white rounded-2xl shadow-xl overflow-hidden">
         <!-- Content -->
-        <div class="p-6 space-y-6">
+
+        <!-- Tabs -->
+        <div class="border-b border-gray-200">
+          <nav class="flex space-x-8 px-5">
+            <button
+              v-for="(tabItem, index) in tabs"
+              :key="index"
+              @click="tab = tabItem.id"
+              :class="[
+                'py-4 px-1 border-b-2 font-medium text-sm flex items-center space-x-2 transition',
+                tab === tabItem.id
+                  ? 'border-orange-500 text-orange-600'
+                  : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300',
+              ]"
+            >
+              <component :is="tabItem.icon" class="w-5 h-5" />
+              <span>{{ tabItem.label }}</span>
+              <span
+                v-if="tabItem.count !== undefined"
+                class="bg-gray-100 text-gray-600 px-2 py-1 rounded-full text-xs"
+              >
+                {{ tabItem.count }}
+              </span>
+            </button>
+          </nav>
+        </div>
+        <!--Ingreso Factura-->
+        <div v-if="tab === 'IFactura'" class="p-1">
           <!-- Notificación -->
           <div
             v-if="mensaje.texto"
@@ -98,26 +119,34 @@
           </div>
 
           <!-- Datos de Factura -->
-          <div>
+          <div class="p-6">
             <h2 class="text-xl font-semibold text-gray-900 mb-4">
               Datos de la Factura
             </h2>
             <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
               <div>
-                <label class="block text-sm font-medium text-gray-700 mb-2"
-                  >Proveedor *</label
-                >
-                <input
+                <label class="block text-sm font-medium text-gray-700 mb-2">
+                  Proveedor *
+                </label>
+                <select
                   v-model="factura.proveedor"
-                  type="text"
                   class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent"
                   :class="{ 'border-red-500': errores.proveedor }"
-                  placeholder="Nombre del proveedor"
-                />
+                >
+                  <option value="" disabled>Seleccione un proveedor</option>
+                  <option
+                    v-for="proveedor in proveedores"
+                    :key="proveedor.id"
+                    :value="proveedor.id"
+                  >
+                    {{ proveedor.nombre_proveedor }}
+                  </option>
+                </select>
                 <p v-if="errores.proveedor" class="mt-1 text-sm text-red-600">
                   {{ errores.proveedor }}
                 </p>
               </div>
+
               <div>
                 <label class="block text-sm font-medium text-gray-700 mb-2"
                   >Número de Factura *</label
@@ -135,7 +164,50 @@
               </div>
               <div>
                 <label class="block text-sm font-medium text-gray-700 mb-2"
-                  >Fecha *</label
+                  >Serie de Factura *</label
+                >
+                <input
+                  v-model="factura.numero"
+                  type="text"
+                  class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent"
+                  :class="{ 'border-red-500': errores.numero }"
+                  placeholder="Número de factura"
+                />
+                <p v-if="errores.numero" class="mt-1 text-sm text-red-600">
+                  {{ errores.numero }}
+                </p>
+              </div>
+              <div>
+                <label class="block text-sm font-medium text-gray-700 mb-2"
+                  >Fecha Emisión*</label
+                >
+                <input
+                  v-model="factura.fecha"
+                  type="date"
+                  class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent"
+                  :class="{ 'border-red-500': errores.fecha }"
+                />
+                <p v-if="errores.fecha" class="mt-1 text-sm text-red-600">
+                  {{ errores.fecha }}
+                </p>
+              </div>
+              <div>
+                <label class="block text-sm font-medium text-gray-700 mb-2"
+                  >Fecha Vencimiento</label
+                >
+                <input
+                  v-model="factura.fecha"
+                  type="date"
+                  class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent"
+                  :class="{ 'border-red-500': errores.fecha }"
+                />
+                <p v-if="errores.fecha" class="mt-1 text-sm text-red-600">
+                  {{ errores.fecha }}
+                </p>
+              </div>
+              <div>
+                <label class="block text-sm font-medium text-gray-700 mb-2"
+                  >Tipo de pago</label
                 >
                 <input
                   v-model="factura.fecha"
@@ -151,7 +223,7 @@
           </div>
 
           <!-- Detalle de Productos -->
-          <div>
+          <div class="p-6">
             <div class="flex justify-between items-center mb-4">
               <h2 class="text-xl font-semibold text-gray-900">
                 Productos de la Factura
@@ -165,19 +237,48 @@
               <table class="w-full border-collapse border border-gray-200">
                 <thead class="bg-gray-100">
                   <tr>
-                    <th class="border border-gray-300 p-3 text-left">Código</th>
-                    <th class="border border-gray-300 p-3 text-left">
+                    <th
+                      class="border border-gray-300 p-3 text-left text-gray-600"
+                    >
                       Producto
                     </th>
-                    <th class="border border-gray-300 p-3 text-right">
+                    <th
+                      class="border border-gray-300 p-3 text-right text-gray-600"
+                    >
                       Cantidad
                     </th>
-                    <th class="border border-gray-300 p-3 text-right">
+                    <th
+                      class="border border-gray-300 p-3 text-right text-gray-600"
+                    >
                       Precio Unitario
                     </th>
-                    <th class="border border-gray-300 p-3 text-right">
+
+                    <th
+                      class="border border-gray-300 p-3 text-right text-gray-600"
+                    >
                       Subtotal
                     </th>
+                    <th
+                      class="border border-gray-300 p-3 text-right text-gray-600"
+                    >
+                      Descuento
+                    </th>
+                    <th
+                      class="border border-gray-300 p-3 text-right text-gray-600"
+                    >
+                      Es Lote
+                    </th>
+                    <th
+                      class="border border-gray-300 p-3 text-right text-gray-600"
+                    >
+                      Precio Lote
+                    </th>
+                    <th
+                      class="border border-gray-300 p-3 text-right text-gray-600"
+                    >
+                      Total
+                    </th>
+
                     <th class="border border-gray-300 p-3"></th>
                   </tr>
                 </thead>
@@ -225,7 +326,7 @@
                       </div>
                     </td>
                     <td
-                      class="border border-gray-200 p-3 text-right font-medium"
+                      class="border border-gray-200 p-3 text-right font-medium text-gray-700"
                     >
                       {{ formatoMoneda(item.cantidad * item.precio) }}
                     </td>
@@ -287,7 +388,7 @@
 
           <!-- Totales -->
           <div
-            class="flex flex-col items-end space-y-2 p-4 bg-gray-50 rounded-lg"
+            class="class=p-6 flex flex-col items-end space-y-2 p-4 bg-gray-50 rounded-lg"
           >
             <div class="text-right">
               <p class="text-gray-700 text-lg">
@@ -304,7 +405,7 @@
 
           <!-- Guardar -->
           <div
-            class="flex flex-col-reverse md:flex-row justify-end space-y-4 space-y-reverse md:space-y-0 md:space-x-4"
+            class="p-6 flex flex-col-reverse md:flex-row justify-end space-y-4 space-y-reverse md:space-y-0 md:space-x-4"
           >
             <button
               @click="limpiarFormulario"
@@ -342,16 +443,38 @@
             </button>
           </div>
         </div>
+        <!--Historial Factura-->
+        <div v-if="tab === 'HFactura'" class="p-1 text-black">Hola jsjs</div>
       </div>
     </main>
   </div>
 </template>
 
 <script>
+import { api } from '../axios';
+import { mostrarAlertaGlobal } from '../components/contenedorDeAlertas.vue';
+import {
+  validarTextoSoloLetras,
+  validarCorreo,
+  validarCampoVacio,
+  validarSoloNumeros,
+  validarSimilaridadContrasena,
+} from '../helper/validators.js';
+const TypeIcon = {
+  template: `<svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16m-7 6h7"></path></svg>`,
+};
+const OfferIcon = {
+  template: `<svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 8h6m-5 0a3 3 0 110 6H9l3 3m-3-6h6m6 1a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>`,
+};
 export default {
   name: 'IngresoFactura',
   data() {
     return {
+      tabs: [
+        { id: 'IFactura', label: 'Ingreso Factura', icon: TypeIcon },
+        { id: 'HFactura', label: 'Historial Facturas', icon: OfferIcon },
+      ],
+      tab: 'HFactura',
       factura: {
         proveedor: '',
         numero: '',
@@ -383,7 +506,7 @@ export default {
       return new Intl.NumberFormat('es-GT', {
         style: 'currency',
         currency: 'GTQ',
-        minimumFractionDigits: 2, // para siempre mostrar 2 decimales
+        minimumFractionDigits: 2,
       }).format(valor);
     },
     agregarItem() {
@@ -437,7 +560,6 @@ export default {
         valido = false;
       }
 
-      // Validar items individuales
       for (let i = 0; i < this.factura.detalle.length; i++) {
         const item = this.factura.detalle[i];
         if (!item.codigo.trim() || !item.nombre.trim() || item.cantidad < 1) {
@@ -458,13 +580,11 @@ export default {
       this.guardando = true;
 
       try {
-        // Simular una llamada a API
         await new Promise((resolve) => setTimeout(resolve, 1500));
 
         console.log('Factura guardada:', this.factura);
         this.mostrarMensaje('Factura guardada con éxito', 'exito');
 
-        // Limpiar después de guardar (opcional)
         setTimeout(() => {
           this.limpiarFormulario();
         }, 2000);
@@ -498,10 +618,28 @@ export default {
         }, 5000);
       }
     },
+    mostrarAlertaError(mensaje) {
+      mostrarAlertaGlobal(mensaje, 'error', 'sm', 'top-center', 300);
+    },
+    mostrarAlertaExito(mensaje) {
+      mostrarAlertaGlobal(mensaje, 'success', 'sm', 'top-center', 300);
+    },
+    async obtenerProveedores() {
+      try {
+        const proveedorCarga = await api.v1.inventario.ObtenerProveedores();
+        this.proveedores = proveedorCarga.data.proveedores;
+      } catch (error) {
+        console.log(error);
+        this.mostrarAlertaError('Error al obtener proveedores');
+      }
+    },
+    obtenerDatosIniciales() {
+      this.obtenerProveedores();
+    },
   },
   mounted() {
-    // Agregar un producto por defecto al cargar
     this.agregarItem();
+    this.obtenerDatosIniciales();
   },
 };
 </script>

@@ -76,7 +76,12 @@ export const useAuthStore = defineStore('auth', {
     },
     async logout() {
       try {
-        await api.v1.auth.logout();
+        const result = await api.v1.auth.logout();
+        if (result.status >= 400) {
+          const errorMessage =
+            result.data?.message || `Error en logout (${result.status})`;
+          throw new Error(`No se pudo hacer el logout: ${errorMessage}`);
+        }
         this.usuario = null;
         this.rutasProtegidas = [];
         this.limiparRutasAIniciales();
@@ -85,6 +90,8 @@ export const useAuthStore = defineStore('auth', {
         localStorage.removeItem('token');
         localStorage.removeItem('usuario');
       } catch (error) {
+        localStorage.removeItem('token');
+        localStorage.removeItem('usuario');
         this.mostrarAlertaError('Error al cerrar sesión. Inténtalo de nuevo.');
         console.error('Error al cerrar sesión:', error);
         return;

@@ -1,13 +1,23 @@
 import axios from 'axios';
 import { useAuthStore } from './stores/auth.js';
-import SignUp from './pages/SignUp.vue';
 const urlConexion = import.meta.env.VITE_URL_CONEXION;
+// Variable global para controlar el estado del refresh
+let isRefreshing = false;
+let refreshSubscribers = [];
+let refreshAttempts = 0;
+const MAX_REFRESH_ATTEMPTS = 2; // Máximo de intentos de refresh
+function onRefreshed(token) {
+  refreshSubscribers.forEach((callback) => callback(token));
+  refreshSubscribers = [];
+}
+function addRefreshSubscriber(callback) {
+  refreshSubscribers.push(callback);
+}
 const api = axios.create({
+  withCredentials: true,
+  timeout: 10000,
   baseURL: urlConexion,
 });
-
-api.defaults.withCredentials = true;
-api.defaults.timeout = 10000;
 
 api.v1 = {
   auth: {
@@ -62,6 +72,11 @@ api.v1 = {
       api.post('/v1/inventario/actualizarProducto', data),
     borrarProducto: (p_producto_Id) =>
       api.delete(`/v1/inventario/borrarProducto/${p_producto_Id}`),
+    ofertasProducto: () => api.get('/v1/inventario/ofertasProducto'),
+    agregarOfertaProducto: (data) =>
+      api.post('/v1/inventario/agregarOfertaProducto', data),
+    borrarProductoOferta: (id_producto_oferta) =>
+      api.delete(`/v1/inventario/borrarProductoOferta/${id_producto_oferta}`),
   },
 };
 api.interceptors.request.use(
@@ -70,7 +85,6 @@ api.interceptors.request.use(
     if (token) {
       config.headers['Authorization'] = `Bearer ${token}`;
     }
-
     return config;
   },
   (error) => {
@@ -81,38 +95,85 @@ api.interceptors.response.use(
   (response) => response,
   async (error) => {
     const authStore = useAuthStore();
-
     const originalRequest = error.config;
+
+    // EXCLUIR endpoints críticos que no deben triggerear refresh
+    const excludedEndpoints = [
+      '/v1/auth/refreshToken',
+      '/v1/auth/login',
+      '/v1/auth/logout', // ← Aquí excluimos el logout
+      '/v1/auth/SignUp',
+    ];
+
+    const isExcludedEndpoint = excludedEndpoints.some((endpoint) =>
+      originalRequest.url.includes(endpoint)
+    );
+
+    if (isExcludedEndpoint) {
+      return Promise.reject(error);
+    }
+
+    // Si ya superamos el máximo de intentos, forzamos logout
+    if (refreshAttempts >= MAX_REFRESH_ATTEMPTS) {
+      // Usamos una función de logout directa para evitar el interceptor
+      forceLogout();
+      return Promise.reject(error);
+    }
 
     if (
       error.response &&
       (error.response.status === 401 || error.response.status === 403) &&
-      !originalRequest._retry &&
-      !originalRequest.url.includes('/refreshtoken')
+      !originalRequest._retry
     ) {
       originalRequest._retry = true;
-      const refrescado = await authStore.refrescarToken();
-      console.log(refrescado);
-      if (refrescado) {
-        originalRequest.headers['Authorization'] =
-          'Bearer ' + localStorage.getItem('token');
 
-        return api(originalRequest);
+      if (isRefreshing) {
+        // Si ya se está refrescando, encolamos la solicitud
+        return new Promise((resolve) => {
+          addRefreshSubscriber((token) => {
+            originalRequest.headers['Authorization'] = `Bearer ${token}`;
+            resolve(api(originalRequest));
+          });
+        });
       }
-    }
-    if (
-      error.response &&
-      (error.response.status === 401 || error.response.status === 403)
-    ) {
-      //localStorage.removeItem('token');
-      //localStorage.removeItem('usuario');
-      //window.location.href = '/';
-    } else {
-      console.error('Error en la solicitud', error);
+
+      isRefreshing = true;
+      refreshAttempts++;
+
+      try {
+        const refrescado = await authStore.refrescarToken();
+
+        if (refrescado) {
+          const newToken = localStorage.getItem('token');
+          isRefreshing = false;
+          refreshAttempts = 0; // Resetear contador si tiene éxito
+          onRefreshed(newToken);
+
+          originalRequest.headers['Authorization'] = `Bearer ${newToken}`;
+          return api(originalRequest);
+        } else {
+          throw new Error('Refresh token failed');
+        }
+      } catch (refreshError) {
+        isRefreshing = false;
+
+        // Si falla el refresh, limpiamos todo y redirigimos
+        if (refreshAttempts >= MAX_REFRESH_ATTEMPTS) {
+          forceLogout();
+        }
+
+        return Promise.reject(refreshError);
+      }
     }
 
     return Promise.reject(error);
   }
 );
 
+function forceLogout() {
+  localStorage.removeItem('token');
+  localStorage.removeItem('usuario');
+
+  window.location.href = '/';
+}
 export { api };

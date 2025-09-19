@@ -1,6 +1,6 @@
 <template>
   <div
-    class="min-h-screen bg-gradiente-personal from-gray-50 to-orange-100 p-4"
+    class=" bg-gradiente-personal from-gray-50 to-orange-100"
   >
     <!-- Header -->
     <header class="bg-white shadow-sm rounded-lg mb-6">

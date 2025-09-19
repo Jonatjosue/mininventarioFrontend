@@ -61,7 +61,26 @@
       <div class="bg-white rounded-2xl shadow-xl overflow-hidden">
         <!-- Tabs Mejoradas -->
         <div class="border-b border-gray-200">
-          <nav class="flex space-x-8 px-6">
+          <!-- Select para móvil -->
+          <div class="block md:hidden px-4 py-2">
+            <select
+              v-model="tab"
+              class="block w-full pl-3 pr-10 py-2 text-base border-gray-300 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm rounded-md"
+            >
+              <option
+                v-for="(tabItem, index) in tabs"
+                :key="index"
+                :value="tabItem.id"
+                class="flex items-center"
+              >
+                {{ tabItem.label }}
+                {{ tabItem.count !== undefined ? `(${tabItem.count})` : '' }}
+              </option>
+            </select>
+          </div>
+
+          <!-- Tabs para desktop -->
+          <nav class="hidden md:flex space-x-8 px-6">
             <button
               v-for="(tabItem, index) in tabs"
               :key="index"
@@ -453,9 +472,9 @@
                           </div>
                           <div class="flex items-center gap-1">
                             <span
-                              class="text-xs px-2 rounded-full font-medium text-gray-500  bg-gray-200  font-mono tracking-tight min-w-[60px] text-center"
+                              class="text-xs px-2 rounded-full font-medium text-gray-500 bg-gray-200 font-mono tracking-tight min-w-[60px] text-center"
                             >
-                              {{ producto.codigo || 'Sin SKU' }}
+                              {{ producto.codigo || 'Sin Codigo' }}
                             </span>
                             <span
                               :class="[
@@ -472,12 +491,22 @@
                     </td>
                     <td class="px-6 py-4 whitespace-nowrap">
                       <div class="text-sm text-gray-900">
-                        Q{{ producto.precioCompra?.toLocaleString() }}
+                        Q{{
+                          producto.precioCompra?.toLocaleString('en-US', {
+                            minimumFractionDigits: 2,
+                            maximumFractionDigits: 2,
+                          })
+                        }}
                       </div>
                     </td>
                     <td class="px-6 py-4 whitespace-nowrap">
                       <div class="text-sm text-gray-900">
-                        Q{{ producto.precioVenta?.toLocaleString() }}
+                        Q{{
+                          producto.precioVenta?.toLocaleString('en-US', {
+                            minimumFractionDigits: 2,
+                            maximumFractionDigits: 2,
+                          })
+                        }}
                       </div>
                     </td>
                     <td class="px-6 py-4 whitespace-nowrap">
@@ -572,7 +601,7 @@
                         {{ producto.nombre }}
                       </h3>
                       <p class="text-sm text-gray-500">
-                        {{ producto.codigo || 'Sin SKU' }}
+                        {{ producto.codigo || 'Sin Codigo' }}
                       </p>
                     </div>
                   </div>
@@ -594,13 +623,23 @@
                   <div>
                     <p class="text-xs text-gray-500">Precio compra</p>
                     <p class="text-sm font-medium text-gray-900">
-                      Q{{ producto.precioCompra?.toLocaleString() }}
+                      Q{{
+                        producto.precioCompra?.toLocaleString('en-US', {
+                          minimumFractionDigits: 2,
+                          maximumFractionDigits: 2,
+                        })
+                      }}
                     </p>
                   </div>
                   <div>
                     <p class="text-xs text-gray-500">Precio Venta</p>
                     <p class="text-sm font-medium text-gray-900">
-                      Q{{ producto.precioVenta?.toLocaleString() }}
+                      Q{{
+                        producto.precioVenta?.toLocaleString('en-US', {
+                          minimumFractionDigits: 2,
+                          maximumFractionDigits: 2,
+                        })
+                      }}
                     </p>
                   </div>
                   <div>
@@ -841,9 +880,731 @@
               </p>
             </div>
           </div>
+          <div v-if="tab === 'oferta'">
+            <div
+              class="flex flex-col lg:flex-row lg:items-center lg:justify-between mb-6 space-y-4 lg:space-y-0"
+            >
+              <h2 class="text-xl font-semibold text-gray-900">
+                Gestión de Ofertas por Producto
+  
+              </h2>
+              <div
+                class="flex flex-col sm:flex-row space-y-2 sm:space-y-0 sm:space-x-4"
+              >
+                <div class="relative">
+                  <input
+                    v-model="filtroBusquedaOfertas"
+                    type="text"
+                    placeholder="Buscar productos con ofertas..."
+                    class="w-full sm:w-64 pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
+                  />
+                  <svg
+                    class="w-5 h-5 text-gray-400 absolute left-3 top-2.5"
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                  >
+                    <path
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                      stroke-width="2"
+                      d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"
+                    />
+                  </svg>
+                </div>
+                <select
+                  v-model="filtroEstadoOferta"
+                  class="w-full sm:w-auto px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
+                >
+                  <option value="">Todos los estados</option>
+                  <option value="activa">Ofertas activas</option>
+                  <option value="programada">Ofertas programadas</option>
+                  <option value="finalizada">Ofertas finalizadas</option>
+                </select>
+              </div>
+            </div>
+
+            <!-- Productos con ofertas - Vista acordeón -->
+            <div class="space-y-4">
+              <div
+                v-for="(producto, index) in productosPaginados"
+                :key="'producto-' + producto.id"
+                class="bg-white border border-gray-200 rounded-lg overflow-hidden"
+              >
+                <!-- Encabezado del producto -->
+                <div class="p-4 flex items-center justify-between bg-gray-50">
+                  <div class="flex items-center space-x-3">
+                    <div
+                      class="w-10 h-10 bg-blue-100 rounded-lg flex items-center justify-center flex-shrink-0"
+                    >
+                      <svg
+                        class="w-5 h-5 text-blue-600"
+                        fill="none"
+                        stroke="currentColor"
+                        viewBox="0 0 24 24"
+                      >
+                        <path
+                          stroke-linecap="round"
+                          stroke-linejoin="round"
+                          stroke-width="2"
+                          d="M5 8h14M5 8a2 2 0 110-4h14a2 2 0 110 4M5 8v10a2 2 0 002 2h10a2 2 0 002-2V8m-9 4h4"
+                        />
+                      </svg>
+                    </div>
+                    <div>
+                      <h3 class="font-semibold text-gray-900">
+                        {{ producto.nombre }}
+                      </h3>
+                      <div class="flex flex-row">
+                        <p class="text-sm text-gray-500 mr-2">
+                          {{ producto.codigo }}
+                        </p>
+                        <p class="text-sm text-gray-500 mr-1">
+                          Precio original
+                        </p>
+                        <p class="text-sm text-gray-500 ml-1">
+                          {{
+                            producto.precio_original.toLocaleString('en-US', {
+                              minimumFractionDigits: 2,
+                              maximumFractionDigits: 2,
+                            })
+                          }}
+                        </p>
+                      </div>
+                    </div>
+                  </div>
+                  <div class="flex items-center space-x-4">
+                    <span class="text-sm text-gray-600">
+                      {{ producto.ofertas.length }} oferta(s)
+                    </span>
+                    <button
+                      @click="toggleOfertasProducto(producto.id)"
+                      class="p-1 text-gray-400 hover:text-gray-600 transition"
+                    >
+                      <svg
+                        class="w-5 h-5"
+                        fill="none"
+                        stroke="currentColor"
+                        viewBox="0 0 24 24"
+                      >
+                        <path
+                          v-if="!producto.mostrarOfertas"
+                          stroke-linecap="round"
+                          stroke-linejoin="round"
+                          stroke-width="2"
+                          d="M19 9l-7 7-7-7"
+                        />
+                        <path
+                          v-else
+                          stroke-linecap="round"
+                          stroke-linejoin="round"
+                          stroke-width="2"
+                          d="M5 15l7-7 7 7"
+                        />
+                      </svg>
+                    </button>
+                  </div>
+                </div>
+
+                <!-- Lista de ofertas del producto (acordeón) -->
+                <div
+                  v-if="producto.mostrarOfertas"
+                  class="border-t border-gray-100"
+                >
+                  <!-- Tabla de ofertas para desktop -->
+                  <div class="hidden lg:block">
+                    <table class="w-full">
+                      <thead class="bg-gray-50">
+                        <tr>
+                          <th
+                            class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+                          >
+                            Precio Oferta
+                          </th>
+                          <th
+                            class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+                          >
+                            Descuento
+                          </th>
+                          <th
+                            class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+                          >
+                            Vigencia
+                          </th>
+
+                          <th
+                            class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+                          >
+                            Acciones
+                          </th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        <tr
+                          v-for="(oferta, ofertaIndex) in producto.ofertas"
+                          :key="oferta.id"
+                          class="hover:bg-gray-50 transition"
+                        >
+                          <td
+                            class="px-6 py-4 whitespace-nowrap text-sm font-semibold text-green-600"
+                          >
+                            Q{{
+                              oferta.precio_oferta?.toLocaleString('en-US', {
+                                minimumFractionDigits: 2,
+                                maximumFractionDigits: 2,
+                              })
+                            }}
+                          </td>
+                          <td class="px-6 py-4 whitespace-nowrap">
+                            <span
+                            v-if="oferta.aplica_por_porcentaje"
+                              class="px-2 py-1 bg-red-100 text-red-800 text-xs font-semibold rounded-full"
+                            >
+                              {{ oferta.porcentaje_descuento }}% OFF
+                            </span>
+                             <span
+                            v-else
+                              class="px-2 py-1 bg-red-100 text-red-800 text-xs font-semibold rounded-full"
+                            >
+                              {{ oferta.porcentaje_descuento }} Q
+                            </span>
+                          </td>
+                          <td
+                            class="px-6 py-4 whitespace-nowrap text-sm text-gray-500"
+                          >
+                            {{ formatFecha(oferta.fecha_inicio) }} -
+                            {{ formatFecha(oferta.fecha_fin) }}
+                          </td>
+
+                          <td
+                            class="px-6 py-4 whitespace-nowrap text-sm font-medium"
+                          >
+                            <button
+                              @click="
+                                eliminarOferta(
+                                  producto.id,
+                                  oferta.id_producto_oferta
+                                )
+                              "
+                              class="text-red-600 hover:text-red-900"
+                            >
+                              Eliminar
+                            </button>
+                          </td>
+                        </tr>
+                      </tbody>
+                    </table>
+                  </div>
+
+                  <!-- Tarjetas de ofertas para móvil -->
+                  <div class="lg:hidden space-y-3 p-4">
+                    <div
+                      v-for="(oferta, ofertaIndex) in producto.ofertas"
+                      :key="'mobile-oferta-' + oferta.id"
+                      class="bg-gray-50 rounded-lg p-3"
+                    >
+                      <div class="grid grid-cols-2 gap-3 mb-2">
+                        <div>
+                          <p class="text-xs text-gray-500">Precio Oferta</p>
+                          <p class="text-sm font-semibold text-green-600">
+                            Q{{
+                              oferta.precio_oferta?.toLocaleString('en-US', {
+                                minimumFractionDigits: 2,
+                                maximumFractionDigits: 2,
+                              })
+                            }}
+                          </p>
+                        </div>
+                        <div>
+                          <p class="text-xs text-gray-500">Descuento</p>
+                          <p class="text-sm font-semibold text-red-600">
+                            {{ oferta.porcentaje_descuento }}% OFF
+                          </p>
+                        </div>
+                        <div>
+                          <p class="text-xs text-gray-500">Vigencia</p>
+                          <p class="text-xs text-gray-900">
+                            {{ formatFechaCorta(oferta.fecha_fin) }}
+                          </p>
+                        </div>
+                      </div>
+                      <div class="flex space-x-2 pt-2 border-t border-gray-200">
+                        <button
+                          @click="
+                            eliminarOferta(
+                              producto.id,
+                              oferta.id_producto_oferta
+                            )
+                          "
+                          class="flex-1 bg-red-50 text-red-600 px-2 py-1 rounded text-xs font-medium"
+                        >
+                          Eliminar
+                        </button>
+                      </div>
+                    </div>
+                  </div>
+                  <div
+                    class="p-4 bg-gray-50 border-t border-gray-100 flex flex-row justify-between"
+                  >
+                    <span class="text-gray-700">{{
+                      'Mejor Descuento Q ' +
+                      producto.precio_calculado.toLocaleString('en-US', {
+                        minimumFractionDigits: 2,
+                        maximumFractionDigits: 2,
+                      })
+                    }}</span>
+                    <div>
+                      <button
+                        @click="mostrarModalNuevaOferta(producto)"
+                        class="px-3 py-1 bg-green-100 text-green-700 text-sm rounded-md hover:bg-green-200 transition flex items-center space-x-1"
+                      >
+                        <svg
+                          class="w-4 h-4"
+                          fill="none"
+                          stroke="currentColor"
+                          viewBox="0 0 24 24"
+                        >
+                          <path
+                            stroke-linecap="round"
+                            stroke-linejoin="round"
+                            stroke-width="2"
+                            d="M12 6v6m0 0v6m0-6h6m-6 0H6"
+                          />
+                        </svg>
+                        <span>Agregar otra oferta</span>
+                      </button>
+                    </div>
+                  </div>
+                  <!-- Botón para agregar más ofertas a este producto -->
+                </div>
+              </div>
+
+              <!-- Mensaje cuando no hay productos con ofertas -->
+              <div
+                v-if="productosConOfertasFiltrados.length === 0"
+                class="text-center py-12 bg-gray-50 rounded-lg"
+              >
+                <svg
+                  class="w-16 h-16 text-gray-400 mx-auto mb-4"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    stroke-width="2"
+                    d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"
+                  />
+                  <path
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    stroke-width="2"
+                    d="M2 15.5V19a2 2 0 002 2h16a2 2 0 002-2v-3.5"
+                  />
+                  <path
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    stroke-width="2"
+                    d="M18 12V5a2 2 0 00-2-2H8a2 2 0 00-2 2v7"
+                  />
+                </svg>
+                <p class="text-gray-500 text-lg">
+                  No se encontraron productos con ofertas
+                </p>
+                <p class="text-gray-400 text-sm">
+                  Crea tu primera oferta para empezar a promocionar productos
+                </p>
+              </div>
+              <div
+                v-if="
+                  productosConOfertasFiltrados.length > 0 && totalPaginas > 1
+                "
+                class="flex items-center justify-between border-t border-gray-200 px-4 py-3 sm:px-6"
+              >
+                <div class="flex flex-1 justify-between sm:hidden">
+                  <button
+                    @click="paginaActual--"
+                    :disabled="paginaActual === 1"
+                    class="relative inline-flex items-center rounded-md border border-gray-300 bg-white px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50"
+                    :class="{
+                      'opacity-50 cursor-not-allowed': paginaActual === 1,
+                    }"
+                  >
+                    Anterior
+                  </button>
+                  <button
+                    @click="paginaActual++"
+                    :disabled="paginaActual === totalPaginas"
+                    class="relative ml-3 inline-flex items-center rounded-md border border-gray-300 bg-white px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50"
+                    :class="{
+                      'opacity-50 cursor-not-allowed':
+                        paginaActual === totalPaginas,
+                    }"
+                  >
+                    Siguiente
+                  </button>
+                </div>
+                <div
+                  class="hidden sm:flex sm:flex-1 sm:items-center sm:justify-between"
+                >
+                  <div>
+                    <p class="text-sm text-gray-700">
+                      Mostrando
+                      <span class="font-medium">{{
+                        (paginaActual - 1) * productosPorPagina + 1
+                      }}</span>
+                      a
+                      <span class="font-medium">{{
+                        Math.min(
+                          paginaActual * productosPorPagina,
+                          productosConOfertasFiltrados.length
+                        )
+                      }}</span>
+                      de
+                      <span class="font-medium">{{
+                        productosConOfertasFiltrados.length
+                      }}</span>
+                      resultados
+                    </p>
+                  </div>
+                  <div>
+                    <nav
+                      class="isolate inline-flex -space-x-px rounded-md shadow-sm"
+                      aria-label="Pagination"
+                    >
+                      <button
+                        @click="paginaActual--"
+                        :disabled="paginaActual === 1"
+                        class="relative inline-flex items-center rounded-l-md px-2 py-2 text-gray-400 ring-1 ring-inset ring-gray-300 hover:bg-gray-50 focus:z-20 focus:outline-offset-0"
+                        :class="{
+                          'opacity-50 cursor-not-allowed': paginaActual === 1,
+                        }"
+                      >
+                        <span class="sr-only">Anterior</span>
+                        <svg
+                          class="h-5 w-5"
+                          viewBox="0 0 20 20"
+                          fill="currentColor"
+                          aria-hidden="true"
+                        >
+                          <path
+                            fill-rule="evenodd"
+                            d="M12.79 5.23a.75.75 0 01-.02 1.06L8.832 10l3.938 3.71a.75.75 0 11-1.04 1.08l-4.5-4.25a.75.75 0 010-1.08l4.5-4.25a.75.75 0 011.06.02z"
+                            clip-rule="evenodd"
+                          />
+                        </svg>
+                      </button>
+
+                      <!-- Números de página -->
+                      <button
+                        v-for="pagina in paginasParaMostrar"
+                        :key="'pagina-' + pagina"
+                        @click="paginaActual = pagina"
+                        :class="[
+                          pagina === paginaActual
+                            ? 'z-10 bg-blue-600 text-white focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-blue-600'
+                            : 'text-gray-900 ring-1 ring-inset ring-gray-300 hover:bg-gray-50 focus:outline-offset-0',
+                          'relative inline-flex items-center px-4 py-2 text-sm font-semibold',
+                        ]"
+                        aria-current="page"
+                      >
+                        {{ pagina }}
+                      </button>
+
+                      <button
+                        @click="paginaActual++"
+                        :disabled="paginaActual === totalPaginas"
+                        class="relative inline-flex items-center rounded-r-md px-2 py-2 text-gray-400 ring-1 ring-inset ring-gray-300 hover:bg-gray-50 focus:z-20 focus:outline-offset-0"
+                        :class="{
+                          'opacity-50 cursor-not-allowed':
+                            paginaActual === totalPaginas,
+                        }"
+                      >
+                        <span class="sr-only">Siguiente</span>
+                        <svg
+                          class="h-5 w-5"
+                          viewBox="0 0 20 20"
+                          fill="currentColor"
+                          aria-hidden="true"
+                        >
+                          <path
+                            fill-rule="evenodd"
+                            d="M7.21 14.77a.75.75 0 01.02-1.06L11.168 10 7.23 6.29a.75.75 0 111.04-1.08l4.5 4.25a.75.75 0 010 1.08l-4.5 4.25a.75.75 0 01-1.06-.02z"
+                            clip-rule="evenodd"
+                          />
+                        </svg>
+                      </button>
+                    </nav>
+                  </div>
+                </div>
+              </div>
+              <!-- finaliza paginación-->
+            </div>
+          </div>
         </div>
       </div>
     </main>
+  </div>
+  <!-- Modal para agregar oferta -->
+  <div v-if="mostrarModalOferta" class="fixed inset-0 z-50 overflow-y-auto">
+    <div
+      class="flex items-center justify-center min-h-screen px-4 pt-4 pb-20 text-center sm:block sm:p-0"
+    >
+      <!-- Fondo del modal -->
+      <div
+        class="fixed inset-0 transition-opacity bg-gray-500 bg-opacity-75"
+        @click="cerrarModalOferta"
+      ></div>
+
+      <!-- Contenido del modal -->
+      <div
+        class="inline-block w-full max-w-md p-6 my-8 overflow-hidden text-left align-middle transition-all transform bg-white shadow-xl rounded-2xl sm:max-w-lg"
+      >
+        <!-- Header -->
+        <div class="flex items-center justify-between mb-4">
+          <h3 class="text-lg font-medium leading-6 text-gray-900">
+            {{ modoEdicion ? 'Editar Oferta' : 'Agregar Oferta al Producto' }}
+          </h3>
+          <button
+            @click="cerrarModalOferta"
+            class="text-gray-400 hover:text-gray-600"
+          >
+            <svg
+              class="w-6 h-6"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+            >
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                stroke-width="2"
+                d="M6 18L18 6M6 6l12 12"
+              />
+            </svg>
+          </button>
+        </div>
+
+        <!-- Formulario -->
+        <form @submit.prevent="guardarOferta">
+          <!-- Selección de Producto (si no viene pre-seleccionado) -->
+          <div v-if="!productoSeleccionado" class="mb-4">
+            <label class="block text-sm font-medium text-gray-700 mb-1"
+              >Producto</label
+            >
+            <select
+              v-model="nuevaOferta.id_producto"
+              required
+              class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+            >
+              <option value="">Seleccionar producto</option>
+              <option
+                v-for="producto in productos"
+                :key="producto.id_producto"
+                :value="producto.id_producto"
+              >
+                {{ producto.nombre }} - {{ producto.codigo }}
+              </option>
+            </select>
+          </div>
+          <div v-else class="mb-4 p-3 bg-gray-100 rounded-md">
+            <p class="text-lg font-semibold text-gray-700">
+              {{ productoSeleccionado.nombre }}
+            </p>
+            <p class="text-sm text-gray-700">
+              {{ productoSeleccionado.codigo }}
+            </p>
+          </div>
+
+          <!-- Selección de Tipo de Oferta -->
+          <div class="mb-4">
+            <label class="block text-sm font-medium text-gray-700 mb-1"
+              >Tipo de Oferta</label
+            >
+            <select
+              v-model="nuevaOferta.id_oferta"
+              required
+              @change="calcularPrecioOferta"
+              class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+            >
+              <option value="">Seleccionar tipo de oferta</option>
+              <option
+                v-for="oferta in ofertasDisponibles"
+                :key="oferta.id_oferta"
+                :value="oferta.id_oferta"
+                :disabled="!oferta.activa"
+              >
+                {{ oferta.nombre }} -
+                <template v-if="oferta.valor_oferta_numerico > 0">
+                  Q{{ oferta.valor_oferta_numerico }} descuento
+                </template>
+                <template v-else-if="oferta.valor_oferta_porcentaje > 0">
+                  {{ oferta.valor_oferta_porcentaje }}% descuento
+                </template>
+                {{ oferta.activa ? '(Activa)' : '(Inactiva)' }}
+              </option>
+            </select>
+          </div>
+
+          <!-- Información de la oferta seleccionada -->
+          <div v-if="ofertaSeleccionada" class="mb-4 p-3 bg-gray-50 rounded-md">
+            <h4 class="font-medium text-gray-900 mb-2">
+              {{ ofertaSeleccionada.nombre }}
+            </h4>
+            <p class="text-sm text-gray-600 mb-2">
+              {{ ofertaSeleccionada.descripcion_tipo }}
+            </p>
+            <div class="flex flex-row justify-between items-center">
+              <div>
+                <p class="text-black">Aplicar por:</p>
+              </div>
+
+              <label
+                class="relative inline-flex items-center cursor-pointer my-2"
+              >
+                <input
+                  v-model="aplica_por_porcentaje"
+                  type="checkbox"
+                  class="sr-only peer"
+                />
+                <div
+                  class="w-36 h-6 bg-primary peer-checked:bg-secondary rounded-full transition-colors duration-300 ease-in-out"
+                ></div>
+                <span
+                  class="absolute left-1 top-1 bg-white w-8 h-4 rounded-full transition-transform duration-300 ease-in-out peer-checked:translate-x-24"
+                ></span>
+                <span
+                  class="absolute left-3 top-1 text-xs font-semibold text-white opacity-0 peer-checked:opacity-100 transition-opacity duration-300"
+                  >Porcentaje</span
+                >
+                <span
+                  class="absolute right-3 top-1 text-xs font-semibold text-white opacity-100 peer-checked:opacity-0 transition-opacity duration-300"
+                  >Cantidad</span
+                >
+              </label>
+            </div>
+
+            <div
+              v-if="productoSeleccionado && !aplica_por_porcentaje"
+              class="grid grid-cols-2 gap-2"
+            >
+              <div>
+                <span class="text-sm text-gray-600">Precio original:</span>
+                <p class="font-semibold text-gray-700">
+                  Q{{
+                    productoSeleccionado.precio_original?.toLocaleString(
+                      'en-US',
+                      {
+                        minimumFractionDigits: 2,
+                        maximumFractionDigits: 2,
+                      }
+                    )
+                  }}
+                </p>
+              </div>
+              <div>
+                <span class="text-sm text-gray-500">Precio con oferta:</span>
+                <p class="font-semibold text-gray-700">
+                  Q{{
+                    (
+                      productoSeleccionado.precio_original -
+                      ofertaSeleccionada.valor_oferta_numerico
+                    ).toLocaleString('en-US', {
+                      minimumFractionDigits: 2,
+                      maximumFractionDigits: 2,
+                    })
+                  }}
+                </p>
+              </div>
+            </div>
+
+            <div
+              v-else-if="productoSeleccionado && aplica_por_porcentaje"
+              class="grid grid-cols-2 gap-2"
+            >
+              <div>
+                <span class="text-sm text-gray-500">Precio original:</span>
+                <p class="font-semibold text-gray-700">
+                  Q{{
+                    productoSeleccionado.precio_original?.toLocaleString(
+                      'en-US',
+                      { minimumFractionDigits: 2, maximumFractionDigits: 2 }
+                    )
+                  }}
+                </p>
+              </div>
+              <div>
+                <span class="text-sm text-gray-500">Precio con oferta:</span>
+                <p class="font-semibold text-gray-700">
+                  Q{{
+                    (
+                      productoSeleccionado.precio_original *
+                      (1 - ofertaSeleccionada.valor_oferta_porcentaje / 100)
+                    ).toLocaleString('en-US', {
+                      minimumFractionDigits: 2,
+                      maximumFractionDigits: 2,
+                    })
+                  }}
+                </p>
+              </div>
+            </div>
+          </div>
+
+          <!-- Fechas de vigencia -->
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+            <div>
+              <label class="block text-sm font-medium text-gray-700 mb-1"
+                >Fecha de inicio</label
+              >
+              <input
+                v-model="nuevaOferta.fecha_inicio"
+                type="date"
+                :disabled="true"
+                required
+                :min="fechaHoy"
+                class="w-full px-3 py-2 border disabled:bg-gray-500 border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+              />
+            </div>
+            <div>
+              <label class="block text-sm font-medium text-gray-700 mb-1"
+                >Fecha de fin</label
+              >
+              <input
+                v-model="nuevaOferta.fecha_fin"
+                type="date"
+                required
+                :min="nuevaOferta.fecha_inicio || fechaHoy"
+                class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+              />
+            </div>
+          </div>
+
+          <!-- Footer del modal -->
+          <div
+            class="flex flex-col-reverse sm:flex-row sm:justify-end sm:space-x-3"
+          >
+            <button
+              type="button"
+              @click="cerrarModalOferta"
+              class="mt-3 sm:mt-0 w-full sm:w-auto px-4 py-2 bg-gray-200 text-gray-700 rounded-md hover:bg-gray-300 transition"
+            >
+              Cancelar
+            </button>
+            <button
+              type="submit"
+              :disabled="guardando"
+              class="w-full sm:w-auto px-4 py-2 bg-primary text-white rounded-md hover:bg-primary-700 disabled:opacity-50 disabled:cursor-not-allowed transition"
+            >
+              <span v-if="guardando">Guardando...</span>
+              <span v-else
+                >{{ modoEdicion ? 'Actualizar' : 'Agregar' }} Oferta</span
+              >
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
   </div>
 </template>
 
@@ -874,6 +1635,9 @@ export default {
   name: 'GestionProductos',
   data() {
     return {
+      paginaActual: 1,
+      productosPorPagina: 5,
+      aplica_por_porcentaje: false,
       tab: 'agregar',
       errores: {},
       edicionActiva: false,
@@ -914,10 +1678,81 @@ export default {
         { id: 'agregar', label: 'Agregar Producto', icon: PlusIcon },
         { id: 'ver', label: 'Ver Productos', icon: EyeIcon, count: 0 },
         { id: 'categoria', label: 'Categoria Producto', icon: PlusIcon },
+        { id: 'oferta', label: 'Ofertas Producto', icon: PlusIcon },
       ],
+      filtroBusquedaOfertas: '',
+      filtroEstadoOferta: '',
+      productosNuevos: [],
+      mostrarModalOferta: false,
+      modoEdicion: false,
+      guardando: false,
+      productoSeleccionado: null,
+      ofertasDisponibles: [],
+      nuevaOferta: {
+        id_producto: '',
+        id_oferta: '',
+        fecha_inicio: '',
+        fecha_fin: '',
+        observaciones: '',
+      },
+      ofertaEditando: null,
     };
   },
   computed: {
+    productosPaginados() {
+      const inicio = (this.paginaActual - 1) * this.productosPorPagina;
+      const fin = inicio + this.productosPorPagina;
+      return this.productosConOfertasFiltrados.slice(inicio, fin);
+    },
+    totalPaginas() {
+      return Math.ceil(
+        this.productosConOfertasFiltrados.length / this.productosPorPagina
+      );
+    },
+    paginasParaMostrar() {
+      const paginas = [];
+      const maxPaginasVisibles = 5;
+      let inicio = Math.max(
+        1,
+        this.paginaActual - Math.floor(maxPaginasVisibles / 2)
+      );
+      const fin = Math.min(inicio + maxPaginasVisibles - 1, this.totalPaginas);
+
+      inicio = Math.max(1, fin - maxPaginasVisibles + 1);
+
+      for (let i = inicio; i <= fin; i++) {
+        paginas.push(i);
+      }
+      return paginas;
+    },
+    fechaHoy() {
+      return new Date().toISOString().split('T')[0];
+    },
+    ofertaSeleccionada() {
+      if (!this.nuevaOferta.id_oferta) return null;
+      return this.ofertasDisponibles.find(
+        (o) => o.id_oferta == this.nuevaOferta.id_oferta
+      );
+    },
+    productosConOfertasFiltrados() {
+      return this.productosNuevos.filter((producto) => {
+        const searchTerm = this.filtroBusquedaOfertas?.toLowerCase() ?? '';
+
+        const matchesSearch =
+          producto?.nombre?.toLowerCase()?.includes(searchTerm) ||
+          producto?.codigo?.toLowerCase()?.includes(searchTerm);
+
+        let matchesStatus = true;
+        if (this.filtroEstadoOferta) {
+          matchesStatus =
+            producto?.ofertas?.some(
+              (oferta) => oferta.estado === this.filtroEstadoOferta
+            ) ?? false;
+        }
+
+        return matchesSearch && matchesStatus;
+      });
+    },
     productosFiltrados() {
       return this.productos.filter((producto) => {
         const coincideBusqueda =
@@ -940,11 +1775,168 @@ export default {
       },
       deep: true,
     },
+    productosConOfertasFiltrados() {
+      this.actualizarPaginacion();
+    },
   },
   mounted() {
     this.validarCatalogosParaCreacionProducto();
   },
   methods: {
+    actualizarPaginacion() {
+      this.paginaActual = 1;
+    },
+    async eliminarOferta(id, idOfertaProducto) {
+      try {
+        const response =
+          await api.v1.inventario.borrarProductoOferta(idOfertaProducto);
+        if (response.status <= 200) {
+          const producto = this.productosNuevos.find((p) => p.id === id);
+          if (producto) {
+            producto.ofertas = producto.ofertas.filter(
+              (oferta) => oferta.id_producto_oferta !== idOfertaProducto
+            );
+          }
+          this.mostrarAlertaExito('Oferta removida con éxito');
+        }
+      } catch (error) {
+        console.error('Error al eliminar oferta', error);
+        const mensaje = error?.response?.data?.mensaje
+          ? error?.response?.data?.mensaje
+          : 'Error al eliminar oferta';
+        this.mostrarAlertaError(mensaje);
+      }
+    },
+    async obtenerProductosOferta() {
+      try {
+        const response = await api.v1.inventario.ofertasProducto();
+        this.productosNuevos = response.data;
+      } catch (error) {
+        this.mostrarAlertaError('Error al cargar productos');
+      }
+    },
+    // Abrir modal para nuevo o edición
+    mostrarModalNuevaOferta(producto = null) {
+      this.productoSeleccionado = producto;
+      this.modoEdicion = false;
+      this.mostrarModalOferta = true;
+
+      // Resetear formulario
+      this.nuevaOferta = {
+        id_producto: producto ? producto.id : '',
+        id_oferta: '',
+        fecha_inicio: this.fechaHoy,
+        fecha_fin: '',
+        observaciones: '',
+      };
+    },
+
+    // Editar oferta existente
+    editarOferta(productoId, ofertaId) {
+      // Buscar la oferta a editar
+      const producto = this.productos.find((p) => p.id === productoId);
+      const oferta = producto.ofertas.find((o) => o.id === ofertaId);
+
+      this.modoEdicion = true;
+      this.ofertaEditando = oferta;
+      this.productoSeleccionado = producto;
+      this.mostrarModalOferta = true;
+
+      // Llenar formulario con datos existentes
+      this.nuevaOferta = {
+        id_producto: productoId,
+        id_oferta: oferta.id_oferta,
+        fecha_inicio: oferta.fecha_inicio,
+        fecha_fin: oferta.fecha_fin,
+        observaciones: oferta.observaciones || '',
+      };
+    },
+
+    cerrarModalOferta() {
+      console.log('llega aqui');
+      this.mostrarModalOferta = false;
+      this.productoSeleccionado = null;
+      this.ofertaEditando = null;
+    },
+
+    async guardarOferta() {
+      try {
+        this.guardando = true;
+        if (
+          new Date(this.nuevaOferta.fecha_fin) <
+          new Date(this.nuevaOferta.fecha_inicio)
+        ) {
+          this.mostrarAlertaError(
+            'La fecha de fin debe ser posterior a la fecha de inicio'
+          );
+          return;
+        }
+
+        const ofertaData = {
+          ...this.nuevaOferta,
+          fecha_vigencia: this.nuevaOferta.fecha_fin,
+          precio_final: this.calcularPrecioFinal(),
+          estado: this.calcularEstadoOferta(),
+          aplica_por_porcentaje: this.aplica_por_porcentaje,
+        };
+
+        if (this.modoEdicion) {
+          await api.v1.inventario.actualizarOferta({
+            ...ofertaData,
+            id: this.ofertaEditando.id,
+          });
+        } else {
+          const { data } =
+            await api.v1.inventario.agregarOfertaProducto(ofertaData);
+          const dataPush = data.data;
+          const index = this.productosNuevos.findIndex(
+            (a) => a.id === dataPush.id
+          );
+          if (index !== -1) {
+            this.productosNuevos[index] = dataPush;
+          } else {
+            this.productosNuevos.push(dataPush);
+          }
+          console.log(this.productosNuevos);
+        }
+        this.guardando = false;
+        this.cerrarModalOferta();
+        this.mostrarAlertaExito('Oferta agregada a producto');
+      } catch (error) {
+        console.error('Error guardando oferta:', error);
+        this.mostrarAlertaError('Error al guardar la oferta');
+      } finally {
+        this.guardando = false;
+      }
+    },
+
+    calcularPrecioFinal() {
+      if (!this.productoSeleccionado || !this.ofertaSeleccionada) return 0;
+
+      const precioOriginal = this.productoSeleccionado.precioVenta;
+      const descuentoNumerico =
+        parseFloat(this.ofertaSeleccionada.valor_oferta_numerico) || 0;
+      const descuentoPorcentaje =
+        parseFloat(this.ofertaSeleccionada.valor_oferta_porcentaje) || 0;
+
+      if (descuentoNumerico > 0) {
+        return precioOriginal - descuentoNumerico;
+      } else if (descuentoPorcentaje > 0) {
+        return precioOriginal * (1 - descuentoPorcentaje / 100);
+      }
+
+      return precioOriginal;
+    },
+
+    calcularEstadoOferta() {
+      const hoy = new Date();
+      const inicio = new Date(this.nuevaOferta.fecha_inicio);
+      const fin = new Date(this.nuevaOferta.fecha_fin);
+
+      if (hoy < inicio) return 'programada';
+      if (hoy > fin) return 'finalizada';
+      return 'activa';
+    },
     async agregarCategoria() {
       try {
         var payload = {
@@ -998,10 +1990,12 @@ export default {
       mostrarAlertaGlobal(mensaje, 'success', 'sm', 'top-center', 300);
     },
     async validarCatalogosParaCreacionProducto() {
+      await this.obtenerProductosOferta();
       await this.cargarCategorias();
       await this.cargarProveedores();
       await this.cargarEstadosProducto();
       await this.cargarProductos();
+      await this.obtenerOfertas();
     },
     async cargarEstadosProducto() {
       try {
@@ -1237,7 +2231,24 @@ export default {
         this.mostrarAlertaError('Error al cargar productos');
       }
     },
-
+    toggleOfertasProducto(productoId) {
+      const producto = this.productosConOfertasFiltrados.find(
+        (p) => p.id === productoId
+      );
+      if (producto) {
+        producto.mostrarOfertas = !producto.mostrarOfertas;
+      }
+    },
+    formatFecha(fecha) {
+      return new Date(fecha).toLocaleDateString();
+    },
+    formatFechaCorta(fecha) {
+      return new Date(fecha).toLocaleDateString('es-ES', {
+        day: '2-digit',
+        month: '2-digit',
+        year: 'numeric',
+      });
+    },
     exportarDatos() {
       const dataStr = JSON.stringify(this.productos, null, 2);
       const dataUri =
@@ -1252,6 +2263,14 @@ export default {
     },
     irAProveedor() {
       this.$router.push('/Proveedores');
+    },
+    async obtenerOfertas() {
+      try {
+        const ofertaReponse = await api.v1.inventario.obtenerOfertas();
+        this.ofertasDisponibles = ofertaReponse.data.ofertas;
+      } catch (error) {
+        this.mostrarAlertaError('Error al cargar ofertas');
+      }
     },
   },
 };
@@ -1279,5 +2298,27 @@ export default {
 
 .transform {
   animation: slideIn 0.3s ease-out;
+}
+
+@media (max-width: 640px) {
+  .max-w-md {
+    margin: 1rem;
+    width: calc(100% - 2rem);
+  }
+}
+
+select:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.toggle::after {
+  content: 'On'; /* o el texto que quieras */
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  color: white;
+  font-size: 12px;
 }
 </style>

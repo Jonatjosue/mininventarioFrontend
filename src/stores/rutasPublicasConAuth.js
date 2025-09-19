@@ -11,29 +11,6 @@ function cargarRutasInicioPublicasConAuth() {
         allowed: true,
       },
     },
-    {
-      path: '/IngresoInventario',
-      name: 'Ingreso de productos',
-      meta: {
-        group: 'Inventario',
-        title: 'Ingreso de productos',
-        icon: 'Home',
-        requiresAuth: true,
-        allowed: true,
-      },
-    },
-    {
-      path: '/IngresoPedidos',
-      name: 'Pedidos',
-      meta: {
-        group: 'Venta',
-        title: 'Pedidos',
-        icon: 'Home',
-        requiresAuth: true,
-        allowed: true,
-      },
-    },
-
     /*   {
       path: '/IngresoPedidos',
       name: 'Pedidos',

@@ -5,6 +5,7 @@ import Menu from './components/Menu.vue';
 import { useRoute } from 'vue-router';
 import { computed, ref } from 'vue';
 
+
 const route = useRoute();
 
 const esMovil = ref(false);

@@ -107,6 +107,7 @@
       </div>
     </div>
   </div>
+  <GlobalLoading v-model:show="loading" @timeout="handleTimeout" />
 </template>
 
 <script>
@@ -129,6 +130,7 @@ export default {
   },
   data() {
     return {
+      loading: false,
       modalAbierto: false,
       email: '',
       password: '',
@@ -153,6 +155,9 @@ export default {
     this.cargarBotonesModal();
   },
   methods: {
+    handleTimeout() {
+      this.mostrarAlerta('No se pudo realizar la solicitud');
+    },
     cargarBotonesModal() {
       this.botonesModal = [
         {
@@ -268,6 +273,7 @@ export default {
     },
     async realizarLogin(email, password, codigoEmpleado = null) {
       try {
+        this.loading = true;
         const response = await api.v1.auth.login({
           correo: email,
           password,
@@ -282,6 +288,7 @@ export default {
           );
           this.guardarCorreoGoogle(response);
           this.$router.push('/signUp');
+          this.loading = false;
           return;
         }
         if (response.data.accessToken) {
@@ -293,6 +300,7 @@ export default {
 
           this.$router.push('/inicio');
           await this.authStore.cargarRutasProtegidasAutenticadas();
+          this.loading = false;
           this.mostrarAlertaExito('Credenciales correctas.');
         } else {
           const mensajeError =
@@ -301,9 +309,15 @@ export default {
             this.mostrarSignUp();
           }
           this.mostrarAlerta(mensajeError);
+          this.loading = false;
         }
       } catch (error) {
-        this.mostrarAlerta('Error al iniciar sesión. Inténtalo de nuevo.');
+        this.loading = false;
+        console.log(error);
+        this.mostrarAlerta(
+          error.response.data.error ||
+            'Error al iniciar sesión. Inténtalo de nuevo.'
+        );
       }
     },
     mostrarSignUp() {

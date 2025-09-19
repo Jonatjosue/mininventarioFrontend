@@ -782,7 +782,10 @@ export default {
           oferta.id_oferta
         );
 
-        if (ofertaActiva.data.mensaje !== 'Oferta Desactivada')
+        if (
+          ofertaActiva.data.mensaje !==
+          'Oferta desactivada/activada correctamente'
+        )
           return this.mostrarAlertaError('No se pudo actualizar la oferta');
 
         const index = this.ofertas.findIndex(

@@ -149,6 +149,7 @@
         </router-link>
       </p>
     </div>
+    <GlobalLoading v-model:show="loading" @timeout="handleTimeout" />
   </section>
 </template>
 <script>
@@ -166,6 +167,7 @@ export default {
   name: 'SignUp',
   data() {
     return {
+      loading: false,
       form: {
         nombre: '',
         apellido: '',
@@ -187,6 +189,9 @@ export default {
     }
   },
   methods: {
+    handleTimeout() {
+      this.mostrarAlertaError('No se pudo realizar la solicitud');
+    },
     mostrarAlertaError(mensaje) {
       mostrarAlertaGlobal(mensaje, 'error', 'sm', 'top-center', 300);
     },
@@ -235,6 +240,7 @@ export default {
     async handleSignUp() {
       if (!this.validarDatosSignUp()) return;
       try {
+        this.loading = true;
         const response = await api.v1.auth.SignUp({
           pNombre: this.form.nombre,
           pApellido: this.form.apellido,
@@ -254,13 +260,16 @@ export default {
             JSON.stringify(response.data.usuario)
           );
           this.$router.push('/Login');
+          this.loading = false;
         } else {
+          this.loading = false;
           this.mostrarAlertaError(
             response.data.error ||
               'Error al crear la cuenta. Inténtalo de nuevo.'
           );
         }
       } catch (error) {
+        this.loading = false;
         console.error('Error en Sign Up:', error);
         const mensajeError =
           error.response?.data?.message ||
