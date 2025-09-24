@@ -26,10 +26,10 @@
             </div>
             <div>
               <h1 class="text-2xl font-bold text-gray-900">
-                Ingreso de Facturas
+                Ingreso de Facturas Clientes
               </h1>
               <p class="text-sm text-gray-600">
-                Registrar productos a través de facturas de compra
+                Registrar ventas a traves de facturas
               </p>
             </div>
           </div>

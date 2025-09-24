@@ -1,7 +1,5 @@
 <template>
-  <div
-    class=" bg-gradiente-personal from-gray-50 to-orange-100"
-  >
+  <div class="bg-gradiente-personal from-gray-50 to-orange-100">
     <!-- Header -->
     <header class="bg-white shadow-sm rounded-lg mb-6">
       <div class="max-w-7xl mx-auto px-4 py-4 sm:px-6 lg:px-8">
@@ -36,12 +34,6 @@
                 }}
               </p>
             </div>
-          </div>
-          <div class="flex items-center space-x-2">
-            <span
-              class="hidden md:inline-block h-2 w-2 rounded-full bg-green-500 animate-pulse"
-            ></span>
-            <span class="text-xs text-green-600 font-medium">Conectado</span>
           </div>
         </div>
       </div>
@@ -126,24 +118,29 @@
                 </div>
 
                 <div v-else>
-                  <label class="block text-sm font-medium text-gray-700 mb-2"
-                    >Seleccionar Cliente *</label
-                  >
-                  <select
+                  <label class="block text-sm font-medium text-gray-700 mb-2">
+                    Seleccionar Cliente *
+                  </label>
+
+                  <VueSelect
                     v-model="nuevoPedido.id_cliente"
-                    class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent"
-                    required
+                    :options="opcionesClientes"
+                    label="texto"
+                    :reduce="(cliente) => cliente.value"
+                    placeholder="Buscar cliente..."
+                    searchable
+                    class="text-gray-700"
+                    no-options-text="no cliente"
                   >
-                    <option value="">Seleccione un cliente</option>
-                    <option value="anonimo">Cliente Anónimo</option>
-                    <option
-                      v-for="cliente in clientes"
-                      :key="cliente.id_cliente"
-                      :value="cliente.id_cliente"
-                    >
-                      {{ cliente.nombre }} - {{ cliente.email }}
-                    </option>
-                  </select>
+                    <template #option="{ texto }">
+                      {{ texto }}
+                    </template>
+                    <template #no-options>
+                      <span class="text-gray-700"
+                        >No se encontraron clientes</span
+                      >
+                    </template>
+                  </VueSelect>
                 </div>
               </div>
 
@@ -222,19 +219,27 @@
                 <table class="w-full border-collapse border border-gray-200">
                   <thead class="bg-gray-100">
                     <tr>
-                      <th class="border border-gray-300 p-3 text-left">
+                      <th
+                        class="border border-gray-300 p-3 text-left text-gray-700"
+                      >
                         Producto
                       </th>
-                      <th class="border border-gray-300 p-3 text-right">
+                      <th
+                        class="border border-gray-300 p-3 text-right text-gray-700"
+                      >
                         Precio Unitario
                       </th>
-                      <th class="border border-gray-300 p-3 text-right">
+                      <th
+                        class="border border-gray-300 p-3 text-right text-gray-700"
+                      >
                         Cantidad
                       </th>
-                      <th class="border border-gray-300 p-3 text-right">
+                      <th
+                        class="border border-gray-300 p-3 text-right text-gray-700"
+                      >
                         Subtotal
                       </th>
-                      <th class="border border-gray-300 p-3"></th>
+                      <th class="border border-gray-300 p-3 text-gray-700"></th>
                     </tr>
                   </thead>
                   <tbody>
@@ -254,7 +259,9 @@
                           </div>
                         </div>
                       </td>
-                      <td class="border border-gray-200 p-3 text-right">
+                      <td
+                        class="border border-gray-200 p-3 text-right text-gray-700"
+                      >
                         {{ formatoMoneda(item.precio) }}
                       </td>
                       <td class="border border-gray-200 p-3">
@@ -278,7 +285,7 @@
                               ></path>
                             </svg>
                           </button>
-                          <span class="w-8 text-center">{{
+                          <span class="w-8 text-center text-gray-700">{{
                             item.cantidad
                           }}</span>
                           <button
@@ -302,7 +309,7 @@
                         </div>
                       </td>
                       <td
-                        class="border border-gray-200 p-3 text-right font-medium"
+                        class="border border-gray-200 p-3 text-right font-medium text-gray-700"
                       >
                         {{ formatoMoneda(item.cantidad * item.precio) }}
                       </td>
@@ -333,7 +340,7 @@
                     <tr>
                       <td
                         colspan="3"
-                        class="border border-gray-200 p-3 text-right font-medium"
+                        class="border border-gray-200 p-3 text-right font-medium text-gray-700"
                       >
                         Total:
                       </td>
@@ -363,7 +370,7 @@
                   nuevoPedido.detalle.length === 0 ||
                   (!esCliente && !nuevoPedido.id_cliente)
                 "
-                class="bg-green-600 text-white px-6 py-2 rounded-lg hover:bg-green-700 disabled:bg-green-400 transition flex items-center"
+                class="bg-green-600 text-white px-6 py-2 rounded-lg hover:bg-green-700 disabled:bg-gray-400 transition flex items-center"
               >
                 <svg
                   v-if="guardando"
@@ -424,9 +431,116 @@
               </div>
             </div>
 
+            <!-- Filtros de estado -->
+            <div class="flex flex-wrap gap-2 mb-6">
+              <button
+                @click="filtroEstado = 'todos'"
+                :class="[
+                  'px-4 py-2 rounded-lg text-sm font-medium transition',
+                  filtroEstado === 'todos'
+                    ? 'bg-orange-600 text-white'
+                    : 'bg-gray-200 text-gray-700 hover:bg-gray-300',
+                ]"
+              >
+                Todos
+              </button>
+              <button
+                @click="filtroEstado = 'en recepcion'"
+                :class="[
+                  'px-4 py-2 rounded-lg text-sm font-medium transition',
+                  filtroEstado === 'en recepcion'
+                    ? 'bg-yellow-500 text-white'
+                    : 'bg-gray-200 text-gray-700 hover:bg-gray-300',
+                ]"
+              >
+                En recepcion
+              </button>
+              <button
+                @click="filtroEstado = 'en preparacion'"
+                :class="[
+                  'px-4 py-2 rounded-lg text-sm font-medium transition',
+                  filtroEstado === 'en preparacion'
+                    ? 'bg-blue-500 text-white'
+                    : 'bg-gray-200 text-gray-700 hover:bg-gray-300',
+                ]"
+              >
+                En Proceso
+              </button>
+              <button
+                @click="filtroEstado = 'listo'"
+                :class="[
+                  'px-4 py-2 rounded-lg text-sm font-medium transition',
+                  filtroEstado === 'listo'
+                    ? 'bg-green-500 text-white'
+                    : 'bg-gray-200 text-gray-700 hover:bg-gray-300',
+                ]"
+              >
+                Completados
+              </button>
+            </div>
+
+            <!-- Sección de Pedidos Recién Ingresados -->
+            <div v-if="pedidosPendientes.length > 0 && !esCliente" class="mb-8">
+              <h3
+                class="text-lg font-semibold text-gray-900 mb-4 flex items-center"
+              >
+                <svg
+                  class="w-5 h-5 text-yellow-500 mr-2"
+                  fill="currentColor"
+                  viewBox="0 0 20 20"
+                >
+                  <path
+                    fill-rule="evenodd"
+                    d="M10 18a8 8 0 100-16 8 8 0 000 16zm1-12a1 1 0 10-2 0v4a1 1 0 00.293.707l2.828 2.829a1 1 0 101.415-1.415L11 9.586V6z"
+                    clip-rule="evenodd"
+                  ></path>
+                </svg>
+                Pedidos Pendientes ({{ pedidosPendientes.length }})
+              </h3>
+              <div class="grid gap-4 md:grid-cols-2">
+                <div
+                  v-for="pedido in pedidosPendientes"
+                  :key="'pendiente-' + pedido.id_cliente_pedido"
+                  class="bg-yellow-50 border border-yellow-200 rounded-lg p-4 hover:shadow-md transition"
+                >
+                  <div class="flex items-start justify-between mb-3">
+                    <div>
+                      <h4 class="font-semibold text-gray-900">
+                        Pedido #{{ pedido.id_cliente_pedido }}
+                      </h4>
+                      <p class="text-sm text-gray-600">
+                        {{ formatFecha(pedido.fecha_creacion) }}
+                      </p>
+                      <p class="text-sm text-gray-600">
+                        Cliente: {{ obtenerNombreCliente(pedido.id_cliente) }}
+                      </p>
+                    </div>
+                    <span
+                      class="px-2 py-1 text-xs font-semibold bg-yellow-500 text-white rounded-full"
+                    >
+                      Pendiente
+                    </span>
+                  </div>
+                  <p class="text-sm text-gray-700 mb-2">
+                    {{ pedido.cantidad_productos }} producto(s) -
+                    <span class="font-semibold">{{
+                      formatoMoneda(pedido.valor_total)
+                    }}</span>
+                  </p>
+                  <button
+                    @click="verDetallePedido(pedido)"
+                    class="w-full bg-orange-600 text-white py-2 px-4 rounded-lg text-sm font-medium hover:bg-orange-700 transition"
+                  >
+                    Atender Pedido
+                  </button>
+                </div>
+              </div>
+            </div>
+
+            <!-- Lista principal de pedidos -->
             <div class="space-y-4">
               <div
-                v-for="pedido in pedidosFiltrados"
+                v-for="pedido in pedidosPaginados"
                 :key="pedido.id_cliente_pedido"
                 class="bg-white border border-gray-200 rounded-lg p-6 hover:shadow-md transition"
               >
@@ -493,6 +607,55 @@
               </div>
             </div>
 
+            <!-- Paginación -->
+            <div
+              v-if="totalPaginas > 1"
+              class="flex justify-center items-center mt-8 space-x-2"
+            >
+              <button
+                @click="paginaActual--"
+                :disabled="paginaActual === 1"
+                :class="[
+                  'px-3 py-2 rounded-lg text-sm font-medium',
+                  paginaActual === 1
+                    ? 'bg-gray-200 text-gray-400 cursor-not-allowed'
+                    : 'bg-gray-200 text-gray-700 hover:bg-gray-300',
+                ]"
+              >
+                Anterior
+              </button>
+
+              <div class="flex space-x-1">
+                <button
+                  v-for="pagina in paginasMostradas"
+                  :key="pagina"
+                  @click="paginaActual = pagina"
+                  :class="[
+                    'w-8 h-8 rounded-lg text-sm font-medium',
+                    pagina === paginaActual
+                      ? 'bg-orange-600 text-white'
+                      : 'bg-gray-200 text-gray-700 hover:bg-gray-300',
+                  ]"
+                >
+                  {{ pagina }}
+                </button>
+                <span v-if="mostrarPuntos" class="px-2 py-2">...</span>
+              </div>
+
+              <button
+                @click="paginaActual++"
+                :disabled="paginaActual === totalPaginas"
+                :class="[
+                  'px-3 py-2 rounded-lg text-sm font-medium',
+                  paginaActual === totalPaginas
+                    ? 'bg-gray-200 text-gray-400 cursor-not-allowed'
+                    : 'bg-gray-200 text-gray-700 hover:bg-gray-300',
+                ]"
+              >
+                Siguiente
+              </button>
+            </div>
+
             <div
               v-if="pedidosFiltrados.length === 0"
               class="text-center py-12 bg-gray-50 rounded-lg"
@@ -523,92 +686,6 @@
         </div>
       </div>
     </main>
-
-    <!-- Modal de Productos -->
-    <div
-      v-if="mostrarModalProductos"
-      class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4"
-    >
-      <div
-        class="bg-white rounded-lg max-w-4xl w-full max-h-[80vh] overflow-hidden flex flex-col"
-      >
-        <div class="p-6 border-b border-gray-200">
-          <h3 class="text-lg font-semibold text-gray-900">
-            Seleccionar Productos
-          </h3>
-        </div>
-
-        <div class="p-6 flex-1 overflow-y-auto">
-          <div class="relative mb-4">
-            <input
-              v-model="filtroProductos"
-              type="text"
-              placeholder="Buscar productos..."
-              class="pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 w-full"
-            />
-            <svg
-              class="w-5 h-5 text-gray-400 absolute left-3 top-2.5"
-              fill="none"
-              stroke="currentColor"
-              viewBox="0 0 24 24"
-            >
-              <path
-                stroke-linecap="round"
-                stroke-linejoin="round"
-                stroke-width="2"
-                d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"
-              ></path>
-            </svg>
-          </div>
-
-          <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <div
-              v-for="producto in productosFiltrados"
-              :key="producto.p_producto_id"
-              class="border border-gray-200 rounded-lg p-4 hover:bg-gray-50 transition cursor-pointer"
-              @click="agregarProducto(producto)"
-            >
-              <div class="flex justify-between items-start">
-                <div>
-                  <h4 class="font-medium text-gray-900">
-                    {{ producto.nombre }}
-                  </h4>
-                  <p class="text-sm text-gray-500">
-                    Código: {{ producto.codigo }}
-                  </p>
-                </div>
-                <span class="font-semibold text-green-600">{{
-                  formatoMoneda(producto.precio)
-                }}</span>
-              </div>
-              <p class="text-sm text-gray-600 mt-2 line-clamp-2">
-                {{ producto.descripcion }}
-              </p>
-            </div>
-          </div>
-
-          <div v-if="productosFiltrados.length === 0" class="text-center py-8">
-            <p class="text-gray-500">No se encontraron productos</p>
-          </div>
-        </div>
-
-        <div class="p-6 border-t border-gray-200 flex justify-end space-x-4">
-          <button
-            @click="mostrarModalProductos = false"
-            class="px-4 py-2 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50 transition"
-          >
-            Cancelar
-          </button>
-          <button
-            @click="mostrarModalProductos = false"
-            class="bg-orange-600 text-white px-4 py-2 rounded-lg hover:bg-orange-700 transition"
-          >
-            Finalizar selección
-          </button>
-        </div>
-      </div>
-    </div>
-
     <!-- Modal Detalle Pedido -->
     <div
       v-if="mostrarModalDetalle"
@@ -617,7 +694,7 @@
       <div
         class="bg-white rounded-lg max-w-4xl w-full max-h-[80vh] overflow-hidden flex flex-col"
       >
-        <div class="p-6 border-b border-gray-200">
+        <div class="p-6 border-b border-gray-200 flex flex-row justify-between">
           <h3 class="text-lg font-semibold text-gray-900">
             Detalles del Pedido #{{ pedidoSeleccionado.id_cliente_pedido }}
           </h3>
@@ -677,6 +754,24 @@
                     {{ pedidoSeleccionado.observacion }}
                   </dd>
                 </div>
+                <div v-if="!esCliente" class="mr-3">
+                  <dt class="text-sm text-gray-500 mb-1">Asignar Estado:</dt>
+                  <dd class="text-sm">
+                    <select
+                      v-model="id_estado_pedido"
+                      class="px-1 py-1 rounded-full text-sm font-medium focus:outline-none"
+                    >
+                      <option value="">Seleccione un estado</option>
+                      <option
+                        v-for="estado in estadosPedido"
+                        :key="estado.id_estado_pedido"
+                        :value="estado.id_estado_pedido"
+                      >
+                        {{ estado.estado_pedido }}
+                      </option>
+                    </select>
+                  </dd>
+                </div>
               </dl>
             </div>
           </div>
@@ -686,14 +781,24 @@
             <table class="w-full border-collapse border border-gray-200">
               <thead class="bg-gray-100">
                 <tr>
-                  <th class="border border-gray-300 p-3 text-left">Producto</th>
-                  <th class="border border-gray-300 p-3 text-right">
+                  <th
+                    class="border border-gray-300 p-3 text-left text-gray-700"
+                  >
+                    Producto
+                  </th>
+                  <th
+                    class="border border-gray-300 p-3 text-right text-gray-700"
+                  >
                     Precio Unitario
                   </th>
-                  <th class="border border-gray-300 p-3 text-right">
+                  <th
+                    class="border border-gray-300 p-3 text-right text-gray-700"
+                  >
                     Cantidad
                   </th>
-                  <th class="border border-gray-300 p-3 text-right">
+                  <th
+                    class="border border-gray-300 p-3 text-right text-gray-700"
+                  >
                     Subtotal
                   </th>
                 </tr>
@@ -706,13 +811,19 @@
                       Código: {{ item.codigo }}
                     </p>
                   </td>
-                  <td class="border border-gray-200 p-3 text-right">
+                  <td
+                    class="border border-gray-200 p-3 text-right text-gray-700"
+                  >
                     {{ formatoMoneda(item.precio) }}
                   </td>
-                  <td class="border border-gray-200 p-3 text-right">
+                  <td
+                    class="border border-gray-200 p-3 text-right text-gray-700"
+                  >
                     {{ item.cantidad }}
                   </td>
-                  <td class="border border-gray-200 p-3 text-right font-medium">
+                  <td
+                    class="border border-gray-200 p-3 text-right font-medium text-gray-700"
+                  >
                     {{ formatoMoneda(item.cantidad * item.precio) }}
                   </td>
                 </tr>
@@ -721,7 +832,7 @@
                 <tr>
                   <td
                     colspan="3"
-                    class="border border-gray-200 p-3 text-right font-medium"
+                    class="border border-gray-200 p-3 text-right font-medium text-gray-700"
                   >
                     Total:
                   </td>
@@ -735,13 +846,215 @@
             </table>
           </div>
         </div>
+        <div
+          class="flex flex-row gap-3 justify-between border-t border-gray-200"
+        >
+          <div class="p-6 flex justify-end">
+            <button
+              @click="mostrarModalDetalle = false"
+              class="border border-orange-500 text-orange-600 px-4 py-2 rounded-lg hover:bg-orange-700 transition"
+            >
+              Cerrar
+            </button>
+          </div>
+          <div v-if="!esCliente" class="p-6 flex justify-end">
+            <button
+              @click="guardarCambio(pedidoSeleccionado)"
+              class="bg-orange-600 text-white px-4 py-2 rounded-lg hover:bg-orange-700 transition"
+            >
+              Confirmar Cambio
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
 
-        <div class="p-6 border-t border-gray-200 flex justify-end">
+    <!-- Modal de Productos -->
+    <div
+      v-if="mostrarModalProductos"
+      class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4"
+    >
+      <div
+        class="bg-white rounded-lg max-w-4xl w-full max-h-[80vh] overflow-hidden flex flex-col"
+      >
+        <div class="p-6 border-b border-gray-200">
+          <h3 class="text-lg font-semibold text-gray-900">
+            Seleccionar Productos
+          </h3>
+        </div>
+
+        <div class="p-6 flex-1 overflow-y-auto">
+          <div class="relative mb-4">
+            <input
+              v-model="filtroProductos"
+              type="text"
+              placeholder="Buscar productos..."
+              class="pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 w-full"
+              @input="resetearPaginacionProductos"
+            />
+            <svg
+              class="w-5 h-5 text-gray-400 absolute left-3 top-2.5"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+            >
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                stroke-width="2"
+                d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"
+              ></path>
+            </svg>
+          </div>
+
+          <!-- Información de resultados -->
+          <div
+            class="flex justify-between items-center mb-4 text-sm text-gray-500"
+          >
+            <span>
+              Mostrando {{ productosPaginados.length }} de
+              {{ productosFiltrados.length }} productos
+            </span>
+            <span>
+              Página {{ paginaActualProductos }} de {{ totalPaginasProductos }}
+            </span>
+          </div>
+
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div
+              v-for="producto in productosPaginados"
+              :key="producto.p_producto_id"
+              class="border border-gray-200 rounded-lg p-4 hover:bg-gray-50 transition cursor-pointer"
+              @click="agregarProducto(producto)"
+            >
+              <div class="flex justify-between items-start">
+                <div>
+                  <h4 class="font-medium text-gray-900">
+                    {{ producto.nombre }}
+                  </h4>
+                  <p class="text-sm text-gray-500">
+                    Código: {{ producto.codigo }}
+                  </p>
+                </div>
+                <span class="font-semibold text-green-600">{{
+                  formatoMoneda(producto.precio)
+                }}</span>
+              </div>
+              <p class="text-sm text-gray-600 mt-2 line-clamp-2">
+                {{ producto.descripcion }}
+              </p>
+            </div>
+          </div>
+
+          <div v-if="productosFiltrados.length === 0" class="text-center py-8">
+            <p class="text-gray-500">No se encontraron productos</p>
+          </div>
+
+          <!-- Paginación -->
+          <div
+            v-if="totalPaginasProductos > 1"
+            class="flex justify-center items-center mt-6 space-x-2"
+          >
+            <button
+              @click="paginaActualProductos--"
+              :disabled="paginaActualProductos === 1"
+              :class="[
+                'px-3 py-2 rounded-lg text-sm font-medium',
+                paginaActualProductos === 1
+                  ? 'bg-gray-200 text-gray-400 cursor-not-allowed'
+                  : 'bg-gray-200 text-gray-700 hover:bg-gray-300',
+              ]"
+            >
+              <svg
+                class="w-4 h-4"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  stroke-width="2"
+                  d="M15 19l-7-7 7-7"
+                />
+              </svg>
+            </button>
+
+            <div class="flex space-x-1">
+              <button
+                v-for="pagina in paginasMostradasProductos"
+                :key="pagina"
+                @click="paginaActualProductos = pagina"
+                :class="[
+                  'w-8 h-8 rounded-lg text-sm font-medium',
+                  pagina === paginaActualProductos
+                    ? 'bg-orange-600 text-white'
+                    : 'bg-gray-200 text-gray-700 hover:bg-gray-300',
+                ]"
+              >
+                {{ pagina }}
+              </button>
+              <span v-if="mostrarPuntosProductos" class="px-2 py-2">...</span>
+            </div>
+
+            <button
+              @click="paginaActualProductos++"
+              :disabled="paginaActualProductos === totalPaginasProductos"
+              :class="[
+                'px-3 py-2 rounded-lg text-sm font-medium',
+                paginaActualProductos === totalPaginasProductos
+                  ? 'bg-gray-200 text-gray-400 cursor-not-allowed'
+                  : 'bg-gray-200 text-gray-700 hover:bg-gray-300',
+              ]"
+            >
+              <svg
+                class="w-4 h-4"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  stroke-width="2"
+                  d="M9 5l7 7-7 7"
+                />
+              </svg>
+            </button>
+          </div>
+
+          <!-- Selector de items por página -->
+          <div
+            v-if="productosFiltrados.length > 0"
+            class="flex items-center justify-end mt-4 space-x-2"
+          >
+            <span class="text-sm text-gray-500">Mostrar:</span>
+            <select
+              v-model="itemsPorPaginaProductos"
+              @change="paginaActualProductos = 1"
+              class="px-2 py-1 border border-gray-300 rounded text-sm"
+            >
+              <option value="8">8</option>
+              <option value="12">12</option>
+              <option value="16">16</option>
+              <option value="20">20</option>
+            </select>
+            <span class="text-sm text-gray-500">productos por página</span>
+          </div>
+        </div>
+
+        <div class="p-6 border-t border-gray-200 flex justify-end space-x-4">
           <button
-            @click="mostrarModalDetalle = false"
+            @click="mostrarModalProductos = false"
+            class="px-4 py-2 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50 transition"
+          >
+            Cancelar
+          </button>
+          <button
+            @click="mostrarModalProductos = false"
             class="bg-orange-600 text-white px-4 py-2 rounded-lg hover:bg-orange-700 transition"
           >
-            Cerrar
+            Finalizar selección
           </button>
         </div>
       </div>
@@ -774,6 +1087,11 @@
 </template>
 
 <script>
+import VueSelect from 'vue3-select';
+import 'vue3-select/dist/vue3-select.css';
+import { api } from '../axios';
+import { mostrarAlertaGlobal } from '../components/contenedorDeAlertas.vue';
+
 // Iconos para las pestañas
 const NewOrderIcon = {
   template: `<svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path></svg>`,
@@ -785,116 +1103,29 @@ const HistoryIcon = {
 
 export default {
   name: 'GestionPedidos',
+  components: {
+    VueSelect,
+  },
   data() {
     return {
+      paginaActualProductos: 1,
+      itemsPorPaginaProductos: 8,
+      filtroEstado: 'todos',
+      paginaActual: 1,
+      id_estado_pedido: '',
+      itemsPorPagina: 10,
       tab: 'nuevo',
-      esCliente: false, // Esto debería determinarse según el rol del usuario autenticado
+      esCliente: false,
       usuario: {
-        id: 1,
-        nombre: 'Juan Pérez',
-        email: 'juan@example.com',
+        id: 0,
+        nombre: '',
+        email: '',
         esEmpleado: false,
       },
-      clientes: [
-        { id_cliente: 1, nombre: 'Cliente Uno', email: 'cliente1@example.com' },
-        { id_cliente: 2, nombre: 'Cliente Dos', email: 'cliente2@example.com' },
-        {
-          id_cliente: 3,
-          nombre: 'Cliente Tres',
-          email: 'cliente3@example.com',
-        },
-      ],
-      productos: [
-        {
-          p_producto_id: 1,
-          codigo: 'PROD001',
-          nombre: 'Producto Uno',
-          descripcion: 'Descripción del producto uno',
-          precio: 100.0,
-        },
-        {
-          p_producto_id: 2,
-          codigo: 'PROD002',
-          nombre: 'Producto Dos',
-          descripcion: 'Descripción del producto dos',
-          precio: 200.0,
-        },
-        {
-          p_producto_id: 3,
-          codigo: 'PROD003',
-          nombre: 'Producto Tres',
-          descripcion: 'Descripción del producto tres',
-          precio: 150.0,
-        },
-        {
-          p_producto_id: 4,
-          codigo: 'PROD004',
-          nombre: 'Producto Cuatro',
-          descripcion: 'Descripción del producto cuatro',
-          precio: 75.5,
-        },
-        {
-          p_producto_id: 5,
-          codigo: 'PROD005',
-          nombre: 'Producto Cinco',
-          descripcion: 'Descripción del producto cinco',
-          precio: 300.0,
-        },
-      ],
-      estadosPedido: [
-        {
-          id_estado_pedido: 1,
-          estado_pedido: 'Pendiente',
-          clase: 'bg-yellow-100 text-yellow-800',
-        },
-        {
-          id_estado_pedido: 2,
-          estado_pedido: 'Confirmado',
-          clase: 'bg-blue-100 text-blue-800',
-        },
-        {
-          id_estado_pedido: 3,
-          estado_pedido: 'En preparación',
-          clase: 'bg-orange-100 text-orange-800',
-        },
-        {
-          id_estado_pedido: 4,
-          estado_pedido: 'En camino',
-          clase: 'bg-purple-100 text-purple-800',
-        },
-        {
-          id_estado_pedido: 5,
-          estado_pedido: 'Entregado',
-          clase: 'bg-green-100 text-green-800',
-        },
-        {
-          id_estado_pedido: 6,
-          estado_pedido: 'Cancelado',
-          clase: 'bg-red-100 text-red-800',
-        },
-      ],
-      pedidos: [
-        {
-          id_cliente_pedido: 1,
-          fecha_creacion: '2023-10-15',
-          id_cliente: 1,
-          id_estado_pedido: 3,
-          observacion: 'Entregar antes de las 5pm',
-          valor_total: 450.5,
-          cantidad_productos: 3,
-          UID_PEDIDO: 'abc123',
-        },
-        {
-          id_cliente_pedido: 2,
-          fecha_creacion: '2023-10-16',
-          id_cliente: 2,
-          id_estado_pedido: 5,
-          observacion: '',
-          valor_total: 200.0,
-          cantidad_productos: 1,
-          UID_PEDIDO: 'def456',
-        },
-      ],
+      clientes: [],
+      productos: [],
+      estadosPedido: [],
+      pedidos: [],
       detallePedido: [],
       nuevoPedido: {
         id_cliente: null,
@@ -916,19 +1147,38 @@ export default {
     };
   },
   computed: {
-    pedidosFiltrados() {
-      if (!this.filtroPedidos) return this.pedidos;
+    opcionesClientes() {
+      const opciones = [{ value: 'anonimo', texto: 'Cliente Anónimo' }];
 
-      return this.pedidos.filter((pedido) => {
-        const searchTerm = this.filtroPedidos.toLowerCase();
-        return (
-          pedido.id_cliente_pedido.toString().includes(searchTerm) ||
-          this.obtenerNombreCliente(pedido.id_cliente)
-            .toLowerCase()
-            .includes(searchTerm) ||
-          pedido.observacion.toLowerCase().includes(searchTerm)
+      return opciones.concat(
+        this.clientes.map((cliente) => ({
+          value: cliente.id_cliente,
+          texto: `${cliente.nombre} - ${cliente.correo}`,
+        }))
+      );
+    },
+    pedidosFiltrados() {
+      let pedidos = this.pedidos;
+
+      if (this.filtroPedidos) {
+        const busqueda = this.filtroPedidos.toLowerCase();
+        pedidos = pedidos.filter(
+          (pedido) =>
+            pedido.id_cliente_pedido.toString().includes(busqueda) ||
+            this.obtenerNombreCliente(pedido.id_cliente)
+              .toLowerCase()
+              .includes(busqueda)
         );
-      });
+      }
+      if (this.filtroEstado !== 'todos') {
+        pedidos = pedidos.filter((pedido) => {
+          const estado = this.obtenerNombreEstado(
+            pedido.id_estado_pedido
+          ).toLowerCase();
+          return estado.includes(this.filtroEstado);
+        });
+      }
+      return pedidos;
     },
     productosFiltrados() {
       if (!this.filtroProductos) return this.productos;
@@ -942,6 +1192,81 @@ export default {
         );
       });
     },
+    totalPaginasProductos() {
+      return Math.ceil(
+        this.productosFiltrados.length / this.itemsPorPaginaProductos
+      );
+    },
+
+    productosPaginados() {
+      const start =
+        (this.paginaActualProductos - 1) * this.itemsPorPaginaProductos;
+      const end = start + this.itemsPorPaginaProductos;
+      return this.productosFiltrados.slice(start, end);
+    },
+
+    paginasMostradasProductos() {
+      const paginas = [];
+      const maxPaginas = 5;
+
+      let start = Math.max(
+        1,
+        this.paginaActualProductos - Math.floor(maxPaginas / 2)
+      );
+      let end = Math.min(this.totalPaginasProductos, start + maxPaginas - 1);
+
+      if (end - start + 1 < maxPaginas) {
+        start = Math.max(1, end - maxPaginas + 1);
+      }
+
+      for (let i = start; i <= end; i++) {
+        paginas.push(i);
+      }
+
+      return paginas;
+    },
+
+    mostrarPuntosProductos() {
+      return this.totalPaginasProductos > this.paginasMostradasProductos.length;
+    },
+    totalPaginas() {
+      return Math.ceil(this.pedidosFiltrados.length / this.itemsPorPagina);
+    },
+
+    pedidosPaginados() {
+      const start = (this.paginaActual - 1) * this.itemsPorPagina;
+      const end = start + this.itemsPorPagina;
+      return this.pedidosFiltrados.slice(start, end);
+    },
+
+    paginasMostradas() {
+      const paginas = [];
+      const maxPaginas = 5;
+
+      let start = Math.max(1, this.paginaActual - Math.floor(maxPaginas / 2));
+      let end = Math.min(this.totalPaginas, start + maxPaginas - 1);
+
+      if (end - start + 1 < maxPaginas) {
+        start = Math.max(1, end - maxPaginas + 1);
+      }
+
+      for (let i = start; i <= end; i++) {
+        paginas.push(i);
+      }
+
+      return paginas;
+    },
+
+    mostrarPuntos() {
+      return this.totalPaginas > this.paginasMostradas.length;
+    },
+    pedidosPendientes() {
+      return this.pedidosFiltrados.filter((pedido) =>
+        this.obtenerNombreEstado(pedido.id_estado_pedido)
+          .toLowerCase()
+          .includes('en recepcion')
+      );
+    },
     totalPedido() {
       return this.nuevoPedido.detalle.reduce(
         (total, item) => total + item.cantidad * item.precio,
@@ -953,20 +1278,102 @@ export default {
     },
   },
   mounted() {
-    // Determinar si el usuario es cliente o empleado
-    // En una aplicación real, esto vendría de la autenticación
-    this.esCliente = !this.usuario.esEmpleado;
-
-    // Si es cliente, establecer su ID como cliente por defecto
+    this.cargarProductos();
+    this.obtenerClientes();
+    this.obtenerPedidos();
+    this.obtenerEstadosPedido();
+    const usuario = JSON.parse(localStorage.getItem('usuario'));
+    if (usuario.rol === 'CLIENTE') this.esCliente = true;
     if (this.esCliente) {
       this.nuevoPedido.id_cliente = this.usuario.id;
+      this.usuario = {
+        id: usuario.id,
+        nombre: usuario.correo,
+        email: usuario.correo,
+        esEmpleado: false,
+      };
     }
+
+    const carrito = JSON.parse(this.$route.query.carrito || '[]');
+    console.log(carrito);
+    carrito.forEach((a) => {
+      const productoDesdeCarrito = {
+        p_producto_id: a.p_producto_Id,
+        codigo: a.codigo,
+        nombre: a.nombre,
+        precio: a.precio,
+        cantidad: a.cantidad,
+      };
+      this.agregarProducto(productoDesdeCarrito);
+    });
   },
   methods: {
+    async obtenerPedidos() {
+      try {
+        const pedidosApi = await api.v1.venta.obtenerPedidos();
+        this.pedidos = pedidosApi.data.pedidos;
+      } catch (error) {
+        this.mostrarAlertaError('error al obtener pedidos');
+      }
+    },
+    async cargarProductos() {
+      try {
+        const productosApi = await api.v1.venta.obtenerProductosPedido();
+        this.productos = productosApi.data.productos;
+      } catch (error) {
+        this.mostrarAlertaError('Error al cargar productos');
+      }
+    },
+    resetearPaginacionProductos() {
+      this.paginaActualProductos = 1;
+    },
+    mostrarAlertaError(mensaje) {
+      mostrarAlertaGlobal(mensaje, 'error', 'sm', 'top-center', 300);
+    },
+    mostrarAlertaExito(mensaje) {
+      mostrarAlertaGlobal(mensaje, 'success', 'sm', 'top-center', 300);
+    },
+    async obtenerEstadosPedido() {
+      try {
+        const estadosAPi = await api.v1.venta.obtenerEstadosPedido();
+        this.estadosPedido = estadosAPi.data.estados;
+      } catch (error) {
+        this.mostrarAlertaError('Error al traer estados del pedido');
+      }
+    },
+    async obtenerClientes() {
+      try {
+        const clientesAPi = await api.v1.venta.obtnerClientes();
+        this.clientes = clientesAPi.data.clientes;
+      } catch (error) {
+        this.mostrarAlertaError('Error al cargar clientes');
+      }
+    },
+    async guardarCambio(pedidoSeleccionado) {
+      try {
+        if (this.id_estado_pedido === '')
+          return this.mostrarAlertaError('Seleccione un estado');
+        const payloadCambio = {
+          id_cliente_pedido: pedidoSeleccionado.id_cliente_pedido,
+          id_estado_pedido: this.id_estado_pedido,
+        };
+        const guardarCambioAPi =
+          await api.v1.venta.actualizarEstadoPedido(payloadCambio);
+        if (guardarCambioAPi.status > 400) {
+          return this.mostrarAlertaError('No se pudo realizar el cambio');
+        }
+        this.mostrarAlertaExito('Cambio guardado');
+        pedidoSeleccionado.id_estado_pedido = this.id_estado_pedido;
+        this.id_estado_pedido = '';
+        this.mostrarModalDetalle = false;
+      } catch (error) {
+        this.mostrarAlertaError('Error al guardar cambio');
+      }
+    },
     formatoMoneda(valor) {
-      return new Intl.NumberFormat('es-MX', {
+      return new Intl.NumberFormat('es-GT', {
         style: 'currency',
-        currency: 'MXN',
+        currency: 'GTQ',
       }).format(valor);
     },
     formatFecha(fecha) {
@@ -992,7 +1399,7 @@ export default {
       const estado = this.estadosPedido.find(
         (e) => e.id_estado_pedido === idEstado
       );
-      return estado ? estado.clase : 'bg-gray-100 text-gray-800';
+      return estado?.clase ? estado.clase : 'bg-gray-800 text-white';
     },
     modificarCantidad(index, cambio) {
       const nuevaCantidad = this.nuevoPedido.detalle[index].cantidad + cambio;
@@ -1014,11 +1421,10 @@ export default {
           codigo: producto.codigo,
           nombre: producto.nombre,
           precio: producto.precio,
-          cantidad: 1,
+          cantidad: producto?.cantidad ?? 1,
         });
       }
-
-      this.mostrarNotificacion('Producto agregado al pedido', 'exito');
+      this.mostrarAlertaExito('Producto agregado al pedido');
     },
     eliminarProducto(index) {
       this.nuevoPedido.detalle.splice(index, 1);
@@ -1027,40 +1433,42 @@ export default {
       this.guardando = true;
 
       try {
-        // Simular una llamada a API
-        await new Promise((resolve) => setTimeout(resolve, 1500));
-
-        // Crear el objeto de pedido según la estructura de la base de datos
         const nuevoPedido = {
           id_cliente_pedido:
             Math.max(...this.pedidos.map((p) => p.id_cliente_pedido), 0) + 1,
           fecha_creacion: new Date().toISOString().split('T')[0],
-          id_cliente: this.nuevoPedido.id_cliente,
-          id_estado_pedido: 1, // Pendiente
+          id_cliente: this.esCliente
+            ? this.usuario.id
+            : this.nuevoPedido.id_cliente,
+          id_estado_pedido: 1,
           observacion: this.nuevoPedido.observacion,
           valor_total: this.totalPedido,
           cantidad_productos: this.nuevoPedido.detalle.reduce(
             (sum, item) => sum + item.cantidad,
             0
           ),
+          productos: this.nuevoPedido.detalle,
           UID_PEDIDO: this.generarUID(),
           id_estado_registro: true,
           id_usuario_creacion: this.usuario.id,
         };
+        const creaPedido = await api.v1.venta.crearPedido(nuevoPedido);
+        if (creaPedido.data?.pedido) {
+          this.pedidos.unshift(nuevoPedido);
 
-        // Agregar a la lista de pedidos
-        this.pedidos.unshift(nuevoPedido);
+          //Actualizar el contador de la pestaña de histroil
+          this.tabs[1].count = this.pedidos.length;
 
-        // Actualizar el contador de la pestaña
-        this.tabs[1].count = this.pedidos.length;
-
-        // Limpiar el formulario
-        this.limpiarPedido();
-
-        this.mostrarNotificacion('Pedido creado con éxito', 'exito');
+          // Limpiar el formulario
+          this.limpiarPedido();
+          this.tab = 'historial';
+          this.mostrarAlertaExito('Pedido creado con exito');
+        }
       } catch (error) {
         console.error('Error creando pedido:', error);
-        this.mostrarNotificacion('Error al crear el pedido', 'error');
+        this.mostrarAlertaError(
+          error.response.data.mensaje || 'Error al crear pedido'
+        );
       } finally {
         this.guardando = false;
       }
@@ -1072,36 +1480,17 @@ export default {
         detalle: [],
       };
     },
-    verDetallePedido(pedido) {
-      this.pedidoSeleccionado = pedido;
-
-      // Simular la carga del detalle del pedido
-      // En una aplicación real, esto vendría de una API
-      this.detallePedido = [
-        {
-          p_producto_id: 1,
-          codigo: 'PROD001',
-          nombre: 'Producto Uno',
-          precio: 100.0,
-          cantidad: 2,
-        },
-        {
-          p_producto_id: 3,
-          codigo: 'PROD003',
-          nombre: 'Producto Tres',
-          precio: 150.0,
-          cantidad: 1,
-        },
-        {
-          p_producto_id: 4,
-          codigo: 'PROD004',
-          nombre: 'Producto Cuatro',
-          precio: 75.5,
-          cantidad: 2,
-        },
-      ];
-
-      this.mostrarModalDetalle = true;
+    async verDetallePedido(pedido) {
+      try {
+        const detallePedidoAPi = await api.v1.venta.obtenerDetallePedido(
+          pedido.id_cliente_pedido
+        );
+        this.detallePedido = detallePedidoAPi.data.detalles;
+        this.pedidoSeleccionado = pedido;
+        this.mostrarModalDetalle = true;
+      } catch (error) {
+        this.mostrarAlertaError('Error al cargar detalles de pedido');
+      }
     },
     generarUID() {
       return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(

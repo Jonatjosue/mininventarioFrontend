@@ -98,6 +98,8 @@ router.beforeEach(async (to, from, next) => {
   if (!authStore.rutaProtegidaPermitida(to.path)) {
     console.log(to.path);
     mostrarAlertaError('No tienes permiso para acceder a esta ruta.');
+    localStorage.removeItem('token');
+    localStorage.removeItem('usuario');
     return next(from.path);
   }
 
