@@ -31,6 +31,24 @@ api.v1 = {
     paginasDefault: () => api.get('/v1/cargaInicial/paginasDefault'),
     cargarRutas: () => api.get('/v1/cargaInicial/cargaRutas'),
   },
+  venta: {
+    obtnerClientes: () => api.get('/v1/venta/obtnerClientes'),
+    obtenerEstadosPedido: () => api.get('/v1/venta/obtenerEstadosPedido'),
+    obtenerProductosPedido: () => api.get('/v1/venta/obtenerProductosPedido'),
+    crearPedido: (data) => api.post('/v1/venta/crearPedido', data),
+    obtenerPedidos: (id_cliente) =>
+      api.get('/v1/venta/obtenerPedidos', {
+        params: { id_cliente },
+      }),
+    obtenerDetallePedido: (id_cliente_pedido) =>
+      api.get('/v1/venta/obtenerDetallePedido', {
+        params: { id_cliente_pedido },
+      }),
+    actualizarEstadoPedido: (data) =>
+      api.post('/v1/venta/actualizarEstadoPedido', data),
+    obtenerProductosParaCompra: () =>
+      api.get('/v1/venta/obtenerProductosParaCompra'),
+  },
   inventario: {
     ObtenerProveedores: () => api.get('/v1/inventario/ObtenerProveedores'),
     AgregarProveedor: (data) =>
@@ -77,6 +95,19 @@ api.v1 = {
       api.post('/v1/inventario/agregarOfertaProducto', data),
     borrarProductoOferta: (id_producto_oferta) =>
       api.delete(`/v1/inventario/borrarProductoOferta/${id_producto_oferta}`),
+    obtenerEstadosFactura: () =>
+      api.get('/v1/inventario/obtenerEstadosFactura'),
+    obtenerTiposPago: () => api.get('/v1/inventario/obtenerTiposPago'),
+    obtenerProductosPorProveedor: (proveedor) =>
+      api.get('/v1/inventario/obtenerProductosPorProveedor', {
+        params: { proveedor },
+      }),
+    obtenerMovimientosInventario: () =>
+      api.get('/v1/inventario/obtenerMovimientosInventario'),
+    agregarMovimientoProducto: (data) =>
+      api.post('/v1/inventario/agregarMovimientoProducto', data),
+    borrarFacturayDetalle: (id_factura) =>
+      api.delete(`/v1/inventario/borrarFacturayDetalle/${id_factura}`),
   },
 };
 api.interceptors.request.use(

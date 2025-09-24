@@ -41,11 +41,20 @@
         <div class="bg-white rounded-2xl shadow-sm p-6 border">
           <div class="flex items-center justify-between">
             <div>
-              <h2 class="text-2xl font-bold text-gray-900 mb-2">
+              <h2
+                v-if="!usuarioCliente"
+                class="text-2xl font-bold text-gray-900 mb-2"
+              >
                 ¡Bienvenido de vuelta! 👋
               </h2>
-              <p class="text-gray-600">
+              <h2 v-else class="text-2xl font-bold text-gray-900 mb-2">
+                ¡Bienvenido de vuelta a SHALAH! 👋
+              </h2>
+              <p v-if="!usuarioCliente" class="text-gray-600">
                 Gestiona tu inventario de manera eficiente y sencilla
+              </p>
+              <p v-else class="text-gray-600">
+                Gestiona tus compras facil y rapido
               </p>
             </div>
             <div class="hidden md:block">
@@ -73,6 +82,7 @@
 
       <!-- Stats Cards -->
       <section
+        v-if="!usuarioCliente"
         class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8"
       >
         <div class="bg-white rounded-xl shadow-sm p-6 border">
@@ -175,7 +185,7 @@
       <!-- Two columns layout -->
       <section class="grid grid-cols-1 lg:grid-cols-3 gap-8">
         <!-- Menu Section -->
-        <div class="lg:col-span-1">
+        <div v-if="!usuarioCliente" class="lg:col-span-1">
           <div class="bg-white rounded-2xl shadow-sm p-6 border">
             <h3 class="text-lg font-semibold text-gray-900 mb-4">
               Acciones rápidas
@@ -184,7 +194,7 @@
         </div>
 
         <!-- Recent Activity / Content Section -->
-        <div class="lg:col-span-2">
+        <div v-if="!usuarioCliente" class="lg:col-span-2">
           <div class="bg-white rounded-2xl shadow-sm p-6 border">
             <div class="flex items-center justify-between mb-6">
               <h3 class="text-lg font-semibold text-gray-900">
@@ -262,6 +272,7 @@ export default {
 
   data() {
     return {
+      usuarioCliente: false,
       recentActivities: [
         {
           message: 'Nuevo producto "Monitor LED 24" agregado al inventario',
@@ -285,7 +296,10 @@ export default {
     },
   },
 
-  mounted() {},
+  mounted() {
+    const usuario = JSON.parse(localStorage.getItem('usuario'));
+    if (usuario.rol === 'CLIENTE') this.usuarioCliente = true;
+  },
 };
 </script>
 

@@ -14,5 +14,25 @@
   <body>
     <div id="app"></div>
     <script type="module" src="/src/main.js"></script>
+    <script>
+      window.TallyConfig = {
+        formId: '3jN0KY',
+        popup: {
+          emoji: {
+            text: '👋',
+            animation: 'wave',
+          },
+          open: {
+            trigger: 'scroll',
+          },
+          autoClose: 3000,
+          showOnce: true,
+          doNotShowAfterSubmit: true,
+          formEventsForwarding: true,
+        },
+      };
+    </script>
+
+    <script async src="https://tally.so/widgets/embed.js"></script>
   </body>
 </html>

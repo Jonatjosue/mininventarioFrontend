@@ -316,6 +316,82 @@
                 class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                 placeholder="Describe las características del producto..."
               ></textarea>
+              <div class="mt-2 pt-3 border-t-2 flex flex-row justify-between">
+                <div class="flex flex-row">
+                  <button
+                    class="btn btn-secondary flex items-center gap-2 bg-slate-500 hover:bg-gray-700 border-gray-500 text-white rounded-lg shadow-none focus:outline-none focus:ring-0"
+                    @click="nuevoProducto.publicado = !nuevoProducto.publicado"
+                  >
+                    <!-- Estado Publicar -->
+                    <template v-if="nuevoProducto.publicado">
+                      <span>Publicar</span>
+                      <svg
+                        viewBox="0 0 20 20"
+                        fill="currentColor"
+                        class="w-5 h-5"
+                      >
+                        <path
+                          d="M10 12.5a2.5 2.5 0 1 0 0-5 2.5 2.5 0 0 0 0 5Z"
+                        />
+                        <path
+                          fill-rule="evenodd"
+                          d="M.664 10.59a1.651 1.651 0 0 1 0-1.186A10.004 10.004 0 0 1 10 3c4.257 0 7.893 2.66 9.336 6.41.147.381.146.804 0 1.186A10.004 10.004 0 0 1 10 17c-4.257 0-7.893-2.66-9.336-6.41ZM14 10a4 4 0 1 1-8 0 4 4 0 0 1 8 0Z"
+                          clip-rule="evenodd"
+                        />
+                      </svg>
+                    </template>
+
+                    <template v-else>
+                      <span>Ocultar</span>
+                      <svg
+                        viewBox="0 0 20 20"
+                        fill="currentColor"
+                        class="size-5"
+                      >
+                        <path
+                          fill-rule="evenodd"
+                          d="M3.28 2.22a.75.75 0 0 0-1.06 1.06l14.5 14.5a.75.75 0 1 0 1.06-1.06l-1.745-1.745a10.029 10.029 0 0 0 3.3-4.38 1.651 1.651 0 0 0 0-1.185A10.004 10.004 0 0 0 9.999 3a9.956 9.956 0 0 0-4.744 1.194L3.28 2.22ZM7.752 6.69l1.092 1.092a2.5 2.5 0 0 1 3.374 3.373l1.091 1.092a4 4 0 0 0-5.557-5.557Z"
+                          clip-rule="evenodd"
+                        />
+                        <path
+                          d="m10.748 13.93 2.523 2.523a9.987 9.987 0 0 1-3.27.547c-4.258 0-7.894-2.66-9.337-6.41a1.651 1.651 0 0 1 0-1.186A10.007 10.007 0 0 1 2.839 6.02L6.07 9.252a4 4 0 0 0 4.678 4.678Z"
+                        />
+                      </svg>
+                    </template>
+                  </button>
+                  <div
+                    role="alert"
+                    class="alert ml-1 py-0 px-1 bg-white text-gray-600 border-slate-300"
+                  >
+                    <svg
+                      fill="none"
+                      viewBox="0 0 24 24"
+                      class="stroke-slate-300 h-6 w-6 shrink-0"
+                    >
+                      <path
+                        stroke-linecap="round"
+                        stroke-linejoin="round"
+                        stroke-width="2"
+                        d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
+                      ></path>
+                    </svg>
+                    <span class="text-xs"
+                      >Muestre o oculte el producto al publico</span
+                    >
+                  </div>
+                </div>
+
+                <div class="flex flex-row gap-2">
+                  <label class="btn border border-slate-500 bg-slate-500">
+                    Cargar Imagen
+                    <input type="file" :disabled="true" class="hidden" />
+                  </label>
+                  <label class="btn border border-slate-500 bg-slate-500">
+                    Ver Imagenes
+                    <input type="file" :disabled="true" class="hidden" />
+                  </label>
+                </div>
+              </div>
             </div>
 
             <div class="flex space-x-4">
@@ -886,7 +962,6 @@
             >
               <h2 class="text-xl font-semibold text-gray-900">
                 Gestión de Ofertas por Producto
-  
               </h2>
               <div
                 class="flex flex-col sm:flex-row space-y-2 sm:space-y-0 sm:space-x-4"
@@ -1057,13 +1132,13 @@
                           </td>
                           <td class="px-6 py-4 whitespace-nowrap">
                             <span
-                            v-if="oferta.aplica_por_porcentaje"
+                              v-if="oferta.aplica_por_porcentaje"
                               class="px-2 py-1 bg-red-100 text-red-800 text-xs font-semibold rounded-full"
                             >
                               {{ oferta.porcentaje_descuento }}% OFF
                             </span>
-                             <span
-                            v-else
+                            <span
+                              v-else
                               class="px-2 py-1 bg-red-100 text-red-800 text-xs font-semibold rounded-full"
                             >
                               {{ oferta.porcentaje_descuento }} Q
@@ -1635,6 +1710,7 @@ export default {
   name: 'GestionProductos',
   data() {
     return {
+      publicar: false,
       paginaActual: 1,
       productosPorPagina: 5,
       aplica_por_porcentaje: false,
@@ -1659,6 +1735,7 @@ export default {
         codigo: '',
         proveedor: '',
         descripcion: '',
+        publicado: false,
       },
       nuevaCategoria: {
         id_tipo_producto: 0,
@@ -2072,6 +2149,7 @@ export default {
           valor_compra: this.nuevoProducto.precioCompra,
           valor_unitario: this.nuevoProducto.precioVenta,
           codigo: this.nuevoProducto.codigo,
+          publicado: this.nuevoProducto.publicado,
         };
 
         const nuevoProductoAgregado =
@@ -2117,6 +2195,7 @@ export default {
           valor_compra: this.nuevoProducto.precioCompra,
           valor_unitario: this.nuevoProducto.precioVenta,
           codigo: this.nuevoProducto.codigo,
+          publicado: this.nuevoProducto.publicado,
         };
 
         const response =
@@ -2166,6 +2245,7 @@ export default {
         id_estado_producto: productoEdicion.id_estado_producto,
         codigo: productoEdicion.codigo,
         proveedor: productoEdicion.id_proveedor,
+        publicado: productoEdicion.publicado,
         descripcion: productoEdicion.descripcion,
       };
       this.tab = 'agregar';

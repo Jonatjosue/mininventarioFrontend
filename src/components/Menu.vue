@@ -1,8 +1,8 @@
 <template>
-  <div class="flex">
+  <div class="flex z-50">
     <aside
       :class="[
-        'fixed top-0 left-0 h-full bg-slate-700 shadow-lg z-40 flex flex-col transition-all duration-300 ease-in-out overflow-hidden',
+        'fixed top-0 left-0 h-full bg-slate-700 shadow-lg flex flex-col transition-all duration-300 ease-in-out overflow-hidden',
         esMovil ? (abierto ? 'w-64' : 'w-0') : abierto ? 'bg-black' : '',
       ]"
       :style="!esMovil ? { width: abierto ? '16rem' : '4rem' } : {}"

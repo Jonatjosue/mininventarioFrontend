@@ -259,7 +259,7 @@ export default {
             'usuario',
             JSON.stringify(response.data.usuario)
           );
-          this.$router.push('/Login');
+          this.$router.push('/');
           this.loading = false;
         } else {
           this.loading = false;
