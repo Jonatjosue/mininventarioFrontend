@@ -2,36 +2,22 @@
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
-    <meta
-      http-equiv="Content-Security-Policy"
-      content="script-src 'self' 'unsafe-inline' 'unsafe-eval' https://accounts.google.com https://apis.google.com https://www.gstatic.com; object-src 'self'"
-    />
     <script src="https://accounts.google.com/gsi/client" async defer></script>
     <link rel="icon" type="image/png" href="./src/assets/icono-web.png" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta
+      http-equiv="Content-Security-Policy"
+      content="script-src 'self' 'unsafe-inline' 'unsafe-eval' https://accounts.google.com https://apis.google.com https://www.gstatic.com https://tally.so; object-src 'self'"
+    />
+
     <title>mininventario</title>
   </head>
   <body>
     <div id="app"></div>
+  
+  
+
     <script type="module" src="/src/main.js"></script>
-    <script>
-      window.TallyConfig = {
-        formId: '3jN0KY',
-        popup: {
-          emoji: {
-            text: '👋',
-            animation: 'wave',
-          },
-          open: {
-            trigger: 'scroll',
-          },
-          autoClose: 3000,
-          showOnce: true,
-          doNotShowAfterSubmit: true,
-          formEventsForwarding: true,
-        },
-      };
-    </script>
 
     <script async src="https://tally.so/widgets/embed.js"></script>
   </body>

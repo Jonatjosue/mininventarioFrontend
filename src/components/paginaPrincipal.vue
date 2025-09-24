@@ -136,6 +136,16 @@
             <h3 class="text-xl md:text-2xl text-gray-200">
               Donde el conocimiento florece y la creatividad encuentra su camino
             </h3>
+            <button
+            class="btn mt-3 btn-primary"
+              data-tally-open="3jN0KY"
+              data-tally-emoji-text="👋"
+              data-tally-emoji-animation="wave"
+              data-tally-auto-close="3000"
+              data-tally-form-events-forwarding="1"
+            >
+              👋 Responder Cuestionario
+            </button>
           </div>
         </div>
 
