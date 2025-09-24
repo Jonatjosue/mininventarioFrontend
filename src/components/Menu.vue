@@ -1,8 +1,8 @@
 <template>
-  <div class="flex z-50">
+  <div class="flex z-30">
     <aside
       :class="[
-        'fixed top-0 left-0 h-full bg-slate-700 shadow-lg flex flex-col transition-all duration-300 ease-in-out overflow-hidden',
+        'fixed top-0 left-0 h-full bg-slate-700 shadow-lg z-40 flex flex-col transition-all duration-300 ease-in-out overflow-hidden',
         esMovil ? (abierto ? 'w-64' : 'w-0') : abierto ? 'bg-black' : '',
       ]"
       :style="!esMovil ? { width: abierto ? '16rem' : '4rem' } : {}"
@@ -123,7 +123,7 @@
     <div
       v-if="abierto && esMovil"
       @click="cerrarEnMovil"
-      class="fixed inset-0 bg-black bg-opacity-40 z-30 transition-opacity duration-300"
+      class="fixed inset-0 bg-black bg-opacity-40 z-20 transition-opacity duration-300"
       aria-hidden="true"
     ></div>
 
