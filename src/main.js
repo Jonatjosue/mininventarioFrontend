@@ -7,7 +7,7 @@ import router from './router/index.js';
 import { useAuthStore } from './stores/auth.js';
 import GlobalLoading from './components/GlobalLoading.vue';
 
-// En tu aplicación Vue
+
 
 const app = createApp(App);
 app.use(createPinia());

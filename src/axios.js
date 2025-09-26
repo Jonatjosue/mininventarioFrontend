@@ -128,11 +128,11 @@ api.interceptors.response.use(
     const authStore = useAuthStore();
     const originalRequest = error.config;
 
-    // EXCLUIR endpoints críticos que no deben triggerear refresh
+    // EXCLUIR endpoints críticos que no deben hacer refresh
     const excludedEndpoints = [
       '/v1/auth/refreshToken',
       '/v1/auth/login',
-      '/v1/auth/logout', // ← Aquí excluimos el logout
+      '/v1/auth/logout',
       '/v1/auth/SignUp',
     ];
 

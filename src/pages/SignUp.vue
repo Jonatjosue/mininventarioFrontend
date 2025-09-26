@@ -1,12 +1,12 @@
 <template>
   <section
-    class="flex items-center justify-center min-h-screen bg-gradient-to-r from-primary to-pink text-white p-6"
+    class="flex flex-col  items-center justify-center min-h-screen bg-gradient-to-r from-primary to-pink text-white p-6"
   >
     <!-- Caja de Sign Up -->
     <div
-      class="bg-white p-10 rounded-2xl border-2 shadow-xl border-gray-200 w-full max-w-5xl"
+      class="bg-white p-10 rounded-2xl border-2 shadow-xl border-gray-200 w-full md:max-w-5xl"
     >
-      <h1 class="text-5xl font-extrabold text-primary mb-10 text-center">
+      <h1 class=" text-sm md:text-5xl font-extrabold text-primary mb-10 text-center">
         Crear cuenta
       </h1>
 
