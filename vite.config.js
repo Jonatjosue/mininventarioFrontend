@@ -7,16 +7,8 @@ export default defineConfig({
   plugins: [
     vue(),
     Pages({
-      dirs: 'src/pages', 
+      dirs: 'src/pages', // carpeta de rutas
       extensions: ['vue'],
     }),
   ],
-  base: './', 
-  build: {
-    outDir: 'dist',
-    assetsDir: 'assets',
-  },
-  server: {
-    historyApiFallback: true,
-  },
 });
