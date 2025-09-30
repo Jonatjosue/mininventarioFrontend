@@ -78,6 +78,49 @@
               <h2 class="text-xl font-semibold text-gray-900">
                 {{ esCliente ? 'Nuevo Pedido' : 'Crear Pedido para Cliente' }}
               </h2>
+              <div v-if="!esCliente" class="form-control">
+                <label class="label">
+                  <span class="label-text text-sm text-gray-700"
+                    >Seleccionar Fecha y Hora de entrega</span
+                  >
+                </label>
+
+                <VDatePicker
+                  v-model="fechaHora"
+                  mode="dateTime"
+                  class="bg-white"
+                  is24hr
+                  :popover="{ visibility: 'click' }"
+                  :min-date="new Date()"
+                  :rules="rules"
+                >
+                  <template #default="{ inputValue, inputEvents }">
+                    <div class="relative w-full text-sm">
+                      <input
+                        class="input input-bordered w-full text-sm pr-10 bg-white text-gray-700 border border-gray-400"
+                        :value="inputValue"
+                        v-on="inputEvents"
+                        placeholder="Selecciona fecha y hora"
+                        readonly
+                      />
+                      <!-- Icono de calendario -->
+                      <svg
+                        class="h-5 w-5 absolute right-3 top-1/2 -translate-y-1/2 text-gray-500"
+                        fill="none"
+                        viewBox="0 0 24 24"
+                        stroke="currentColor"
+                      >
+                        <path
+                          stroke-linecap="round"
+                          stroke-linejoin="round"
+                          stroke-width="2"
+                          d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"
+                        />
+                      </svg>
+                    </div>
+                  </template>
+                </VDatePicker>
+              </div>
             </div>
 
             <!-- Datos del Pedido -->
@@ -453,7 +496,7 @@
                     : 'bg-gray-200 text-gray-700 hover:bg-gray-300',
                 ]"
               >
-                En recepcion
+                En Recepción
               </button>
               <button
                 @click="filtroEstado = 'en preparacion'"
@@ -464,7 +507,7 @@
                     : 'bg-gray-200 text-gray-700 hover:bg-gray-300',
                 ]"
               >
-                En Proceso
+                En Preparación
               </button>
               <button
                 @click="filtroEstado = 'listo'"
@@ -475,7 +518,18 @@
                     : 'bg-gray-200 text-gray-700 hover:bg-gray-300',
                 ]"
               >
-                Completados
+                Listos
+              </button>
+              <button
+                @click="filtroEstado = 'entregado'"
+                :class="[
+                  'px-4 py-2 rounded-lg text-sm font-medium transition',
+                  filtroEstado === 'entregado'
+                    ? 'bg-green-700 text-white'
+                    : 'bg-gray-200 text-gray-700 hover:bg-gray-300',
+                ]"
+              >
+                Entregados
               </button>
             </div>
 
@@ -495,7 +549,7 @@
                     clip-rule="evenodd"
                   ></path>
                 </svg>
-                Pedidos Pendientes ({{ pedidosPendientes.length }})
+                Pedidos en Recepción ({{ pedidosPendientes.length }})
               </h3>
               <div class="grid gap-4 md:grid-cols-2">
                 <div
@@ -511,6 +565,19 @@
                       <p class="text-sm text-gray-600">
                         {{ formatFecha(pedido.fecha_creacion) }}
                       </p>
+                      <p
+                        v-if="pedido.fecha_entrega || pedido.hora_entrega"
+                        class="text-sm text-gray-500"
+                      >
+                        Fecha y hora de entrega:
+                        {{
+                          formatearFechaHoraEntrega(
+                            pedido.fecha_entrega,
+                            pedido.hora_entrega
+                          )
+                        }}
+                      </p>
+
                       <p class="text-sm text-gray-600">
                         Cliente: {{ obtenerNombreCliente(pedido.id_cliente) }}
                       </p>
@@ -551,6 +618,18 @@
                     </h3>
                     <p class="text-sm text-gray-500">
                       {{ formatFecha(pedido.fecha_creacion) }}
+                    </p>
+                    <p
+                      v-if="pedido.fecha_entrega || pedido.hora_entrega"
+                      class="text-sm text-gray-500"
+                    >
+                      Fecha y hora aproximada entrega:
+                      {{
+                        formatearFechaHoraEntrega(
+                          pedido.fecha_entrega,
+                          pedido.hora_entrega
+                        )
+                      }}
                     </p>
                     <p class="text-sm text-gray-500" v-if="!esCliente">
                       Cliente: {{ obtenerNombreCliente(pedido.id_cliente) }}
@@ -1089,6 +1168,16 @@
 <script>
 import VueSelect from 'vue3-select';
 import 'vue3-select/dist/vue3-select.css';
+import {
+  obtenerHoraParaBackend,
+  fechaParaBackend,
+  fechaParaBackendLocal,
+  numeroHoraABackend,
+  formatearFechaLegible,
+  formatearFechaHoraEntrega,
+  formatearHoraLegible,
+  formatearHora,
+} from '../helper/utils.js';
 import { api } from '../axios';
 import { mostrarAlertaGlobal } from '../components/contenedorDeAlertas.vue';
 
@@ -1108,12 +1197,32 @@ export default {
   },
   data() {
     return {
+      rules: {
+        hours: (hour) => {
+          const ahora = new Date();
+          const fechaSeleccion = this.fechaHora;
+
+          const esHoy =
+            fechaSeleccion.getFullYear() === ahora.getFullYear() &&
+            fechaSeleccion.getMonth() === ahora.getMonth() &&
+            fechaSeleccion.getDate() === ahora.getDate();
+
+          if (esHoy && hour < ahora.getHours()) return false;
+
+          const horasPermitidas = [
+            1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 15, 16, 17, 18,
+            19, 20, 21, 22, 23,
+          ];
+          return horasPermitidas.includes(hour);
+        },
+      },
+      fechaHora: new Date(),
       paginaActualProductos: 1,
       itemsPorPaginaProductos: 8,
       filtroEstado: 'todos',
       paginaActual: 1,
       id_estado_pedido: '',
-      itemsPorPagina: 10,
+      itemsPorPagina: 3,
       tab: 'nuevo',
       esCliente: false,
       usuario: {
@@ -1142,7 +1251,7 @@ export default {
       mensajeNotificacion: '',
       tabs: [
         { id: 'nuevo', label: 'Nuevo Pedido', icon: NewOrderIcon },
-        { id: 'historial', label: 'Historial', icon: HistoryIcon, count: 2 },
+        { id: 'historial', label: 'Historial', icon: HistoryIcon, count: 0 },
       ],
     };
   },
@@ -1186,9 +1295,9 @@ export default {
       return this.productos.filter((producto) => {
         const searchTerm = this.filtroProductos.toLowerCase();
         return (
-          producto.nombre.toLowerCase().includes(searchTerm) ||
-          producto.codigo.toLowerCase().includes(searchTerm) ||
-          producto.descripcion.toLowerCase().includes(searchTerm)
+          producto.nombre?.toLowerCase().includes(searchTerm) ||
+          producto.codigo?.toLowerCase().includes(searchTerm) ||
+          producto.descripcion?.toLowerCase().includes(searchTerm)
         );
       });
     },
@@ -1295,7 +1404,6 @@ export default {
     }
 
     const carrito = JSON.parse(this.$route.query.carrito || '[]');
-    console.log(carrito);
     carrito.forEach((a) => {
       const productoDesdeCarrito = {
         p_producto_id: a.p_producto_Id,
@@ -1308,10 +1416,24 @@ export default {
     });
   },
   methods: {
+    formatearFechaHoraEntrega(fecha, hora) {
+      return formatearFechaHoraEntrega(fecha, hora);
+    },
+    formatearFechaHoraLegible(fecha, hora) {
+      return formatearFechaHoraLegible(fecha, hora);
+    },
+    formatearFechaLegible(fecha) {
+      return formatearFechaLegible(fecha);
+    },
+    formatearHoraLegible(fecha) {
+      return formatearHoraLegible(fecha);
+    },
     async obtenerPedidos() {
       try {
         const pedidosApi = await api.v1.venta.obtenerPedidos();
         this.pedidos = pedidosApi.data.pedidos;
+        const cantidad = this.tabs.find((a) => a.id === 'historial');
+        cantidad.count = this.pedidos.length;
       } catch (error) {
         this.mostrarAlertaError('error al obtener pedidos');
       }
@@ -1431,7 +1553,20 @@ export default {
     },
     async crearPedido() {
       this.guardando = true;
-
+      console.log(this.fechaHora);
+      const fechaParaBackendHora = formatearHora(this.fechaHora);
+      const fechaParaBackendposjpra2 = obtenerHoraParaBackend(this.fechaHora);
+      const fechaHoraEntrega = fechaParaBackendLocal(this.fechaHora);
+      const timestamp = fechaParaBackend(this.fechaHora, 'timestamp');
+      const isoString = fechaParaBackend(this.fechaHora, 'iso');
+      /*console.log('fecha', fecuita);
+      console.log('Timestamp para backend:', timestamp);
+      console.log(new Date());
+      console.log('ISO string para backend:', isoString);
+      console.log('Original:', this.fechaHora);
+      console.log('Formateada para backend:', fechaParaBackendHora);
+      console.log('Formateada para backend3:', fechaParaBackendposjpra2);*/
+      // return false;
       try {
         const nuevoPedido = {
           id_cliente_pedido:
@@ -1442,6 +1577,7 @@ export default {
             : this.nuevoPedido.id_cliente,
           id_estado_pedido: 1,
           observacion: this.nuevoPedido.observacion,
+          fecha_entrega: this.esCliente ? null : fechaHoraEntrega,
           valor_total: this.totalPedido,
           cantidad_productos: this.nuevoPedido.detalle.reduce(
             (sum, item) => sum + item.cantidad,

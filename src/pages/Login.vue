@@ -149,7 +149,9 @@ export default {
   },
   created() {
     // Verifica si el usuario ya está logueado
-    if (localStorage.getItem('usuario')) {
+    const usuario = localStorage.getItem('usuario');
+    const token = localStorage.getItem('token');
+    if (token !== null && usuario !== null) {
       this.$router.push('/Inicio');
     }
     this.cargarBotonesModal();

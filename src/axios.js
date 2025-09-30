@@ -19,6 +19,8 @@ const api = axios.create({
   baseURL: urlConexion,
 });
 
+axios.defaults.withCredentials = true;
+
 api.v1 = {
   auth: {
     rutasInicio: () => api.get('/v1/auth/rutasInicio'),
@@ -30,6 +32,10 @@ api.v1 = {
   cargaInicial: {
     paginasDefault: () => api.get('/v1/cargaInicial/paginasDefault'),
     cargarRutas: () => api.get('/v1/cargaInicial/cargaRutas'),
+    obtenerhistorialInicalLogs: () =>
+      api.get('/v1/cargaInicial/obtenerhistorialInicalLogs'),
+    obtenerResumenProductos: () =>
+      api.get('/v1/cargaInicial/obtenerResumenProductos'),
   },
   venta: {
     obtnerClientes: () => api.get('/v1/venta/obtnerClientes'),

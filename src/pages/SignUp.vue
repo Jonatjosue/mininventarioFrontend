@@ -1,12 +1,14 @@
 <template>
   <section
-    class="flex flex-col  items-center justify-center min-h-screen bg-gradient-to-r from-primary to-pink text-white p-6"
+    class="flex md:h-screen py-5 flex-col items-center justify-center bg-gradient-to-r from-primary to-pink text-white px-7 "
   >
     <!-- Caja de Sign Up -->
     <div
       class="bg-white p-10 rounded-2xl border-2 shadow-xl border-gray-200 w-full md:max-w-5xl"
     >
-      <h1 class=" text-sm md:text-5xl font-extrabold text-primary mb-10 text-center">
+      <h1
+        class="text-3xl md:text-5xl font-extrabold text-primary mb-10 text-center"
+      >
         Crear cuenta
       </h1>
 
@@ -18,7 +20,7 @@
           <input
             v-model="form.nombre"
             type="text"
-            class="input input-bordered w-full"
+            class="input input-bordered w-full bg-black text-white placeholder-gray-400"
             placeholder=""
           />
           <div
