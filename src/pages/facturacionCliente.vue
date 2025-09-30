@@ -146,62 +146,8 @@
               </div>
             </div>
             <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
-              <div>
-                <label class="block text-sm font-medium text-gray-700 mb-2">
-                  Proveedor *
-                </label>
-                <select
-                  v-model="factura.proveedor"
-                  :disabled="bloquearCampos"
-                  class="disabled:bg-slate-600 w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent"
-                  :class="{ 'border-red-500': errores.proveedor }"
-                >
-                  <option value="" disabled>Seleccione un proveedor</option>
-                  <option
-                    v-for="proveedor in proveedores"
-                    :key="proveedor.id"
-                    :value="proveedor.id"
-                  >
-                    {{ proveedor.nombre_proveedor }}
-                  </option>
-                </select>
-                <p v-if="errores.proveedor" class="mt-1 text-sm text-red-600">
-                  {{ errores.proveedor }}
-                </p>
-              </div>
 
-              <div>
-                <label class="block text-sm font-medium text-gray-700 mb-2"
-                  >Número de Factura *</label
-                >
-                <input
-                  v-model="factura.numero"
-                  type="text"
-                  :disabled="bloquearCampos"
-                  class="disabled:bg-slate-600 w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent"
-                  :class="{ 'border-red-500': errores.numero }"
-                  placeholder="Número de factura"
-                />
-                <p v-if="errores.numero" class="mt-1 text-sm text-red-600">
-                  {{ errores.numero }}
-                </p>
-              </div>
-              <div>
-                <label class="block text-sm font-medium text-gray-700 mb-2"
-                  >Serie de Factura *</label
-                >
-                <input
-                  v-model="factura.serie"
-                  :disabled="bloquearCampos"
-                  type="text"
-                  class="disabled:bg-slate-600 w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent"
-                  :class="{ 'border-red-500': errores.serie }"
-                  placeholder="Número de factura"
-                />
-                <p v-if="errores.serie" class="mt-1 text-sm text-red-600">
-                  {{ errores.serie }}
-                </p>
-              </div>
+
               <div>
                 <label class="block text-sm font-medium text-gray-700 mb-2"
                   >Fecha Emisión*</label

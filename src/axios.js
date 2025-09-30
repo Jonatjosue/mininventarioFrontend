@@ -19,6 +19,8 @@ const api = axios.create({
   baseURL: urlConexion,
 });
 
+axios.defaults.withCredentials = true;
+
 api.v1 = {
   auth: {
     rutasInicio: () => api.get('/v1/auth/rutasInicio'),
@@ -30,6 +32,10 @@ api.v1 = {
   cargaInicial: {
     paginasDefault: () => api.get('/v1/cargaInicial/paginasDefault'),
     cargarRutas: () => api.get('/v1/cargaInicial/cargaRutas'),
+    obtenerhistorialInicalLogs: () =>
+      api.get('/v1/cargaInicial/obtenerhistorialInicalLogs'),
+    obtenerResumenProductos: () =>
+      api.get('/v1/cargaInicial/obtenerResumenProductos'),
   },
   venta: {
     obtnerClientes: () => api.get('/v1/venta/obtnerClientes'),
@@ -128,11 +134,11 @@ api.interceptors.response.use(
     const authStore = useAuthStore();
     const originalRequest = error.config;
 
-    // EXCLUIR endpoints críticos que no deben triggerear refresh
+    // EXCLUIR endpoints críticos que no deben hacer refresh
     const excludedEndpoints = [
       '/v1/auth/refreshToken',
       '/v1/auth/login',
-      '/v1/auth/logout', // ← Aquí excluimos el logout
+      '/v1/auth/logout',
       '/v1/auth/SignUp',
     ];
 

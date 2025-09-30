@@ -1,11 +1,11 @@
 <template>
-  <div class="min-h-screen bg-gray-50 bg-gradiente-personal">
+  <div class="bg-gray-50 bg-gradiente-personal">
     <!-- Header -->
-    <header class="bg-white shadow-sm sticky top-0">
+    <header class="bg-white shadow-sm sticky top-0 z-20">
       <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div class="flex justify-between items-center py-4">
           <!-- Logo -->
-          <div class="flex items-center space-x-3">
+          <div class="flex items-center">
             <div
               class="w-10 h-10 bg-gradient-to-r from-orange-500 to-red-600 rounded-lg flex items-center justify-center"
             >
@@ -17,13 +17,18 @@
           </div>
 
           <!-- Carrito y acciones -->
-          <div class="flex items-center space-x-4">
+          <div class="flex items-center">
             <!-- Carrito -->
             <button
               @click="mostrarCarrito = !mostrarCarrito"
               class="relative p-2 text-gray-600 hover:text-orange-600 transition"
             >
-              <i class="fas fa-shopping-cart text-xl"></i>
+              <svg viewBox="0 0 20 20" fill="currentColor" class="size-5">
+                <path
+                  d="M1 1.75A.75.75 0 0 1 1.75 1h1.628a1.75 1.75 0 0 1 1.734 1.51L5.18 3a65.25 65.25 0 0 1 13.36 1.412.75.75 0 0 1 .58.875 48.645 48.645 0 0 1-1.618 6.2.75.75 0 0 1-.712.513H6a2.503 2.503 0 0 0-2.292 1.5H17.25a.75.75 0 0 1 0 1.5H2.76a.75.75 0 0 1-.748-.807 4.002 4.002 0 0 1 2.716-3.486L3.626 2.716a.25.25 0 0 0-.248-.216H1.75A.75.75 0 0 1 1 1.75ZM6 17.5a1.5 1.5 0 1 1-3 0 1.5 1.5 0 0 1 3 0ZM15.5 19a1.5 1.5 0 1 0 0-3 1.5 1.5 0 0 0 0 3Z"
+                />
+              </svg>
+
               <span
                 v-if="carrito.length > 0"
                 class="absolute -top-1 -right-1 bg-orange-600 text-white text-xs rounded-full w-5 h-5 flex items-center justify-center"
@@ -33,7 +38,7 @@
             </button>
 
             <!-- Usuario -->
-            <div class="flex items-center space-x-2">
+            <div class="flex items-center">
               <div
                 class="w-8 h-8 bg-orange-300 rounded-full flex items-center justify-center"
               >
@@ -43,9 +48,10 @@
                   />
                 </svg>
               </div>
-              <span class="text-sm font-medium text-gray-700">{{
-                usuario.nombre
-              }}</span>
+              <span
+                class="text-sm font-medium text-gray-700 line-clamp-1 truncate max-w-[120px] md:max-w-96"
+                >{{ usuario.nombre }}</span
+              >
             </div>
           </div>
         </div>
@@ -74,44 +80,64 @@
               class="w-full px-4 py-3 rounded-lg bg-white/10 backdrop-blur-sm border border-white/20 text-white placeholder-orange-200 focus:outline-none focus:ring-2 focus:ring-white"
               @input="resetearPaginacion"
             />
-            <i
-              class="fas fa-search absolute right-3 top-3.5 text-orange-200"
-            ></i>
           </div>
         </div>
       </div>
 
       <!-- Filtros y ordenamiento -->
       <div
-        class="flex flex-col sm:flex-row sm:items-center sm:justify-between mb-6 space-y-4 sm:space-y-0"
+        class="flex flex-col sm:flex-row sm:items-start sm:justify-between mb-6"
       >
-        <div class="flex flex-wrap gap-2">
+        <div
+          class="relative flex flex-row justify-between items-center max-w-[90dvw] md:w-full"
+        >
+          <!-- Botón Izquierda -->
           <button
-            v-for="categoria in categorias"
-            :key="categoria.id_tipo_producto"
-            @click="toggleCategoria(categoria.id_tipo_producto)"
-            :class="[
-              'px-4 py-2 rounded-full text-sm font-medium transition',
-              categoriasSeleccionadas.includes(categoria.id_tipo_producto)
-                ? 'bg-orange-600 text-white'
-                : 'bg-gray-200 text-gray-700 hover:bg-gray-300',
-            ]"
+            @click="scrollLeft"
+            class="absolute left-0 bg-white rounded-full p-2 text-gray-700 hover:bg-gray-200"
           >
-            {{ categoria.nombre }}
+            ‹
+          </button>
+
+          <!-- Contenedor scrollable -->
+          <div
+            ref="scrollContainer"
+            class="flex gap-2 overflow-x-auto scrollbar-thin rounded-full scrollbar-thumb-gray-800 scrollbar-track-gray-100 p-2 mx-8 scroll-smooth"
+          >
+            <button
+              v-for="categoria in categorias"
+              :key="categoria.id_tipo_producto"
+              @click="toggleCategoria(categoria.id_tipo_producto)"
+              :class="[
+                'px-4 py-2 rounded-full text-sm font-medium whitespace-nowrap transition',
+                categoriasSeleccionadas.includes(categoria.id_tipo_producto)
+                  ? 'bg-orange-600 text-white'
+                  : 'bg-gray-200 text-gray-700 hover:bg-gray-300',
+              ]"
+            >
+              {{ categoria.nombre }}
+            </button>
+          </div>
+
+          <!-- Botón Derecha -->
+          <button
+            @click="scrollRight"
+            class="absolute right-0 bg-white rounded-full p-2 text-gray-700 hover:bg-gray-200"
+          >
+            ›
           </button>
         </div>
-
-        <select
-          v-model="ordenamiento"
-          class="px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500"
-          @change="resetearPaginacion"
-        >
-          <option value="nombre">Ordenar por nombre</option>
-          <option value="precio-asc">Precio: Menor a mayor</option>
-          <option value="precio-desc">Precio: Mayor a menor</option>
-          <option value="relevancia">Relevancia</option>
-        </select>
       </div>
+      <select
+        v-model="ordenamiento"
+        class="px-3 py-1 mb-5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500"
+        @change="resetearPaginacion"
+      >
+        <option value="nombre">Ordenar por nombre</option>
+        <option value="precio-asc">Precio: Menor a mayor</option>
+        <option value="precio-desc">Precio: Mayor a menor</option>
+        <option value="relevancia">Relevancia</option>
+      </select>
 
       <!-- Grid de Productos -->
       <div
@@ -123,14 +149,13 @@
           class="bg-white rounded-xl shadow-md hover:shadow-xl transition overflow-hidden group"
         >
           <!-- Imagen del producto -->
-          <div class="relative overflow-hidden">
+          <div class="">
             <svg
-              xmlns="http://www.w3.org/2000/svg"
               fill="none"
               viewBox="0 0 24 24"
               stroke-width="1.5"
               stroke="currentColor"
-              class="size-60 pl-6"
+              class="size-60 pl-6 text-gray-300"
             >
               <path
                 stroke-linecap="round"
@@ -194,7 +219,7 @@
             </div>
 
             <!-- Botones de acción -->
-            <div class="flex space-x-2">
+            <div class="flex gap-1">
               <button
                 @click="verDetalleProducto(producto)"
                 class="flex-1 bg-gray-100 text-gray-700 py-2 px-3 rounded-lg hover:bg-gray-200 transition text-sm font-medium"
@@ -216,7 +241,7 @@
       <!-- Paginación -->
       <div
         v-if="totalPaginas > 1"
-        class="flex justify-center items-center space-x-2"
+        class="flex justify-center items-center gap-1"
       >
         <button
           @click="paginaActual--"
@@ -224,14 +249,14 @@
           :class="[
             'px-3 py-2 rounded-lg text-sm font-medium',
             paginaActual === 1
-              ? 'bg-gray-200 text-gray-400 cursor-not-allowed'
+              ? 'bg-gray-400 text-gray-400 cursor-not-allowed'
               : 'bg-gray-200 text-gray-700 hover:bg-gray-300',
           ]"
         >
           <i class="fas fa-chevron-left"></i>
         </button>
 
-        <div class="flex space-x-1">
+        <div class="flex gap-1">
           <button
             v-for="pagina in paginasMostradas"
             :key="pagina"
@@ -254,7 +279,7 @@
             'px-3 py-2 rounded-lg text-sm font-medium',
             paginaActual === totalPaginas
               ? 'bg-gray-200 text-gray-400 cursor-not-allowed'
-              : 'bg-gray-200 text-gray-700 hover:bg-gray-300',
+              : 'bg-gray-400 text-gray-700 hover:bg-gray-300',
           ]"
         >
           <i class="fas fa-chevron-right"></i>
@@ -302,8 +327,7 @@
               <img
                 :src="
                   imagenPrincipal ||
-                  productoSeleccionado.imagen ||
-                  'https://via.placeholder.com/400x300?text=Producto'
+                  productoSeleccionado.imagen
                 "
                 :alt="productoSeleccionado.nombre"
                 class="w-full h-64 object-cover rounded-lg mb-4"
@@ -420,7 +444,7 @@
     </div>
 
     <!-- Carrito Lateral -->
-    <div v-if="mostrarCarrito" class="fixed inset-0 overflow-hidden">
+    <div v-if="mostrarCarrito" class="fixed inset-0 z-50 overflow-hidden">
       <div
         class="absolute inset-0 bg-black bg-opacity-50"
         @click="mostrarCarrito = false"
@@ -446,7 +470,6 @@
             </div>
             <div class="p-1 flex mr-16 flex-row justify-evenly">
               <svg
-                xmlns="http://www.w3.org/2000/svg"
                 fill="none"
                 viewBox="0 0 24 24"
                 stroke-width="1.5"
@@ -482,9 +505,26 @@
                 class="flex items-center space-x-4 p-4 bg-gray-50 rounded-lg"
               >
                 <img
+                  v-if="item.imagen"
                   :src="item.imagen"
                   class="w-16 h-16 object-cover rounded"
                 />
+                <svg
+                  v-else
+                  data-v-0da8fd7f=""
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  stroke-width="1.5"
+                  stroke="currentColor"
+                  class="size-28 text-gray-500"
+                >
+                  <path
+                    data-v-0da8fd7f=""
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    d="m2.25 15.75 5.159-5.159a2.25 2.25 0 0 1 3.182 0l5.159 5.159m-1.5-1.5 1.409-1.409a2.25 2.25 0 0 1 3.182 0l2.909 2.909m-18 3.75h16.5a1.5 1.5 0 0 0 1.5-1.5V6a1.5 1.5 0 0 0-1.5-1.5H3.75A1.5 1.5 0 0 0 2.25 6v12a1.5 1.5 0 0 0 1.5 1.5Zm10.5-11.25h.008v.008h-.008V8.25Zm.375 0a.375.375 0 1 1-.75 0 .375.375 0 0 1 .75 0Z"
+                  ></path>
+                </svg>
                 <div class="flex-1">
                   <h4 class="font-medium text-gray-900">{{ item.nombre }}</h4>
                   <p class="text-sm text-gray-500">
@@ -579,7 +619,7 @@ export default {
       categoriasSeleccionadas: [],
       ordenamiento: 'nombre',
       paginaActual: 1,
-      itemsPorPagina: 12,
+      itemsPorPagina: 8,
       mostrarModalDetalle: false,
       productoSeleccionado: {},
       imagenPrincipal: '',
@@ -682,6 +722,12 @@ export default {
     },
   },
   methods: {
+    scrollLeft() {
+      this.$refs.scrollContainer.scrollBy({ left: -200, behavior: 'smooth' });
+    },
+    scrollRight() {
+      this.$refs.scrollContainer.scrollBy({ left: 200, behavior: 'smooth' });
+    },
     mostrarAlertaError(mensaje) {
       mostrarAlertaGlobal(mensaje, 'error', 'sm', 'top-center', 300);
     },
@@ -730,7 +776,7 @@ export default {
     },
     agregarAlCarrito(producto) {
       const existingItem = this.carrito.find(
-        (item) => item.p_producto_id === producto.p_producto_id
+        (item) => item.p_producto_Id === producto.p_producto_Id
       );
 
       if (existingItem) {
@@ -797,14 +843,6 @@ export default {
         currency: 'GTQ',
       }).format(valor);
     },
-    /*mostrarNotificacion(mensaje) {
-      this.mensajeNotificacion = mensaje;
-      //this.mostrarNotificacion = true;
-
-      setTimeout(() => {
-        //this.mostrarNotificacion = false;
-      }, 3000);
-    },*/
   },
   mounted() {
     const usuario = JSON.parse(localStorage.getItem('usuario'));
@@ -824,6 +862,10 @@ export default {
 </script>
 
 <style scoped>
+.scrollbar-thin {
+  scrollbar-width: none;
+  scrollbar-color: #c1c1c1 #f1f1f1;
+}
 .line-clamp-2 {
   display: -webkit-box;
   -webkit-line-clamp: 2;

@@ -1,5 +1,7 @@
 <template>
-  <div class="min-h-screen bg-gradiente-personal from-blue-50 to-indigo-100">
+  <div
+    class="h-screen flex flex-col justify-between bg-gradiente-personal from-blue-50 to-indigo-100"
+  >
     <!-- Header -->
     <header class="bg-white shadow-sm border-b">
       <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -35,7 +37,7 @@
     </header>
 
     <!-- Main Content -->
-    <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+    <main class="m-5 md:m-10   ">
       <!-- Welcome Section -->
       <section class="mb-8">
         <div class="bg-white rounded-2xl shadow-sm p-6 border">
@@ -85,9 +87,9 @@
         v-if="!usuarioCliente"
         class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8"
       >
-        <div class="bg-white rounded-xl shadow-sm p-6 border">
+        <div class="bg-white rounded-xl shadow-sm ">
           <div class="flex items-center">
-            <div class="p-3 bg-blue-100 rounded-lg">
+            <div class="py-10 px-5 bg-blue-100 rounded-lg">
               <svg
                 class="w-6 h-6 text-blue-600"
                 fill="none"
@@ -104,16 +106,18 @@
             </div>
             <div class="ml-4">
               <p class="text-sm font-medium text-gray-600">Productos</p>
-              <p class="text-2xl font-bold text-gray-900">1,248</p>
+              <p class="text-2xl font-bold text-gray-900">
+                {{ resumen.cantidad_productos }}
+              </p>
             </div>
           </div>
         </div>
 
-        <div class="bg-white rounded-xl shadow-sm p-6 border">
+        <div class=" bg-white rounded-xl shadow-sm ">
           <div class="flex items-center">
-            <div class="p-3 bg-green-100 rounded-lg">
+            <div class="py-10 px-4 bg-green-100 rounded-lg">
               <svg
-                class="w-6 h-6 text-green-600"
+                class="w-8 h-6 text-green-600"
                 fill="none"
                 stroke="currentColor"
                 viewBox="0 0 24 24"
@@ -128,14 +132,16 @@
             </div>
             <div class="ml-4">
               <p class="text-sm font-medium text-gray-600">En stock</p>
-              <p class="text-2xl font-bold text-gray-900">856</p>
+              <p class="text-2xl font-bold text-gray-900">
+                {{ resumen.enstock }}
+              </p>
             </div>
           </div>
         </div>
 
-        <div class="bg-white rounded-xl shadow-sm p-6 border">
+        <div class="bg-white rounded-xl shadow-sm ">
           <div class="flex items-center">
-            <div class="p-3 bg-yellow-100 rounded-lg">
+            <div class="py-10 px-5 bg-yellow-100 rounded-lg">
               <svg
                 class="w-6 h-6 text-yellow-600"
                 fill="none"
@@ -152,14 +158,16 @@
             </div>
             <div class="ml-4">
               <p class="text-sm font-medium text-gray-600">Bajo stock</p>
-              <p class="text-2xl font-bold text-gray-900">42</p>
+              <p class="text-2xl font-bold text-gray-900">
+                {{ resumen.bajostock }}
+              </p>
             </div>
           </div>
         </div>
 
-        <div class="bg-white rounded-xl shadow-sm p-6 border">
+        <div class="bg-white rounded-xl shadow-sm ">
           <div class="flex items-center">
-            <div class="p-3 bg-red-100 rounded-lg">
+            <div class="py-10 px-5 bg-red-100 rounded-lg">
               <svg
                 class="w-6 h-6 text-red-600"
                 fill="none"
@@ -176,7 +184,9 @@
             </div>
             <div class="ml-4">
               <p class="text-sm font-medium text-gray-600">Agotados</p>
-              <p class="text-2xl font-bold text-gray-900">12</p>
+              <p class="text-2xl font-bold text-gray-900">
+                {{ resumen.agotados }}
+              </p>
             </div>
           </div>
         </div>
@@ -229,8 +239,12 @@
                   </svg>
                 </div>
                 <div class="flex-1">
-                  <p class="text-sm text-gray-900">{{ activity.message }}</p>
-                  <p class="text-xs text-gray-500">{{ activity.time }}</p>
+                  <p class="text-sm text-gray-900">{{ activity.usuario }}</p>
+                  <p class="text-xs text-gray-500">{{ activity.accion }}</p>
+                  <p class="text-xs text-gray-400">{{ activity.fecha }}</p>
+                  <p v-if="activity.producto" class="text-xs text-gray-400">
+                    {{ activity.producto }}
+                  </p>
                 </div>
               </div>
             </div>
@@ -240,7 +254,7 @@
     </main>
 
     <!-- Footer -->
-    <footer class="bg-white border-t mt-12">
+    <footer class="bg-white border-t mt-12 0">
       <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
         <div class="flex items-center justify-between">
           <p class="text-sm text-gray-600">
@@ -266,6 +280,8 @@
 
 <script>
 import { useAuthStore } from '../stores/auth';
+import { api } from '../axios';
+import { mostrarAlertaGlobal } from '../components/contenedorDeAlertas.vue';
 
 export default {
   name: 'Inicio',
@@ -273,20 +289,13 @@ export default {
   data() {
     return {
       usuarioCliente: false,
-      recentActivities: [
-        {
-          message: 'Nuevo producto "Monitor LED 24" agregado al inventario',
-          time: 'Hace 2 minutos',
-        },
-        {
-          message: 'Stock de "Teclado Mecánico" actualizado',
-          time: 'Hace 15 minutos',
-        },
-        {
-          message: 'Usuario admin inició sesión',
-          time: 'Hace 30 minutos',
-        },
-      ],
+      resumen: {
+        cantidad_productos: 0,
+        enstock: 0,
+        bajostock: 0,
+        agotados: 0,
+      },
+      recentActivities: [],
     };
   },
 
@@ -299,6 +308,36 @@ export default {
   mounted() {
     const usuario = JSON.parse(localStorage.getItem('usuario'));
     if (usuario.rol === 'CLIENTE') this.usuarioCliente = true;
+    this.realizarCargaInicial();
+  },
+  methods: {
+    async realizarCargaInicial() {
+      await this.obtenerLogs();
+      await this.obtenerResumenProductos();
+    },
+    mostrarAlerta(mensaje) {
+      mostrarAlertaGlobal(mensaje, 'error', 'sm', 'top-center', 300);
+    },
+    mostrarAlertaExito(mensaje) {
+      mostrarAlertaGlobal(mensaje, 'success', 'sm', 'top-center', 300);
+    },
+    async obtenerResumenProductos() {
+      try {
+        const apiResumenProductos =
+          await api.v1.cargaInicial.obtenerResumenProductos();
+        this.resumen = apiResumenProductos.data.resumenProductosFormateado;
+      } catch (error) {
+        this.mostrarAlerta('Error al obtener resumen productos');
+      }
+    },
+    async obtenerLogs() {
+      try {
+        const logs = await api.v1.cargaInicial.obtenerhistorialInicalLogs();
+        this.recentActivities = logs.data.logs;
+      } catch (error) {
+        this.mostrarAlerta('Error al cargar logs');
+      }
+    },
   },
 };
 </script>

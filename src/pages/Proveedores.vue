@@ -240,86 +240,86 @@
                   fill="none"
                   stroke="currentColor"
                   viewBox="0 0 24 24"
-                >
+                  >
                   <path
-                    stroke-linecap="round"
+                  stroke-linecap="round"
                     stroke-linejoin="round"
                     stroke-width="2"
                     d="M12 6v6m0 0v6m0-6h6m-6 0H6"
-                  ></path>
-                </svg>
-                <span>Actualizar Proveedor</span>
-              </button>
-              <button
+                    ></path>
+                  </svg>
+                  <span>Actualizar Proveedor</span>
+                </button>
+                <button
                 @click="limpiarFormulario"
                 class="bg-gray-500 text-white px-6 py-3 rounded-lg font-semibold hover:bg-gray-600 transition"
-              >
+                >
                 Limpiar Formulario
               </button>
             </div>
           </div>
-
+          
           <!-- Ver Proveedores -->
           <div v-if="tab === 'ver'">
             <div
-              class="flex flex-col lg:flex-row lg:items-center lg:justify-between mb-6 space-y-4 lg:space-y-0"
+            class="flex flex-col lg:flex-row lg:items-center lg:justify-between mb-6 space-y-4 lg:space-y-0"
             >
-              <h2 class="text-xl font-semibold text-gray-900">
-                Proveedores Registrados
-              </h2>
-              <div
-                class="flex flex-col sm:flex-row space-y-2 sm:space-y-0 sm:space-x-4"
+            <h2 class="text-xl font-semibold text-gray-900">
+              Proveedores Registrados
+            </h2>
+            <div
+            class="flex flex-col sm:flex-row space-y-2 sm:space-y-0 sm:space-x-4"
               >
-                <div class="relative">
-                  <input
-                    v-model="filtroBusqueda"
-                    type="text"
-                    placeholder="Buscar proveedores..."
-                    class="w-full sm:w-64 pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500"
-                  />
-                  <svg
-                    class="w-5 h-5 text-gray-400 absolute left-3 top-2.5"
-                    fill="none"
-                    stroke="currentColor"
-                    viewBox="0 0 24 24"
-                  >
-                    <path
-                      stroke-linecap="round"
-                      stroke-linejoin="round"
-                      stroke-width="2"
+              <div class="relative">
+                <input
+                v-model="filtroBusqueda"
+                type="text"
+                placeholder="Buscar proveedores..."
+                class="w-full sm:w-64 pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500"
+                />
+                <svg
+                class="w-5 h-5 text-gray-400 absolute left-3 top-2.5"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+                >
+                <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                stroke-width="2"
                       d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"
-                    ></path>
-                  </svg>
+                      ></path>
+                    </svg>
+                  </div>
                 </div>
               </div>
-            </div>
-
-            <!-- Vista de tarjetas para móvil -->
-            <div class="lg:hidden space-y-4">
-              <div
+              
+              <!-- Vista de tarjetas para móvil -->
+              <div class="lg:hidden space-y-4">
+                <div
                 v-for="(proveedor, index) in proveedoresFiltrados"
                 :key="'mobile-' + index"
                 class="bg-white border border-gray-200 rounded-lg p-4 shadow-sm"
               >
-                <div class="flex items-start justify-between mb-3">
-                  <div class="flex items-center space-x-3">
+              <div class="flex items-start justify-between mb-3">
+                <div class="flex items-center space-x-3">
                     <div
                       class="w-10 h-10 bg-green-100 rounded-lg flex items-center justify-center flex-shrink-0"
-                    >
+                      >
                       <svg
                         class="w-5 h-5 text-green-600"
                         fill="none"
                         stroke="currentColor"
                         viewBox="0 0 24 24"
                       >
-                        <path
+                      <path
                           stroke-linecap="round"
                           stroke-linejoin="round"
                           stroke-width="2"
                           d="M17 9V7a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2m2 4h10a2 2 0 002-2v-6a2 2 0 00-2-2H9a2 2 0 00-2 2v6a2 2 0 002 2z"
-                        ></path>
-                      </svg>
-                    </div>
+                          ></path>
+                        </svg>
+                      </div>
                     <div>
                       <h3 class="font-semibold text-gray-900">
                         {{ proveedor.nombre_proveedor }}
@@ -330,7 +330,7 @@
                     </div>
                   </div>
                 </div>
-
+                
                 <div class="grid grid-cols-1 gap-3 mb-3">
                   <div>
                     <p class="text-xs text-gray-500">Teléfono</p>
@@ -351,38 +351,37 @@
                     </p>
                   </div>
                 </div>
-
                 <div class="flex space-x-2 pt-3 border-t border-gray-100">
                   <button
                     @click="editarProveedor(index)"
                     class="flex-1 bg-blue-50 text-blue-600 px-3 py-2 rounded text-sm font-medium hover:bg-blue-100 transition"
-                  >
+                    >
                     Editar
                   </button>
                   <button
-                    @click="eliminarProveedor(index)"
-                    class="flex-1 bg-red-50 text-red-600 px-3 py-2 rounded text-sm font-medium hover:bg-red-100 transition"
+                  @click="eliminarProveedor(index)"
+                  class="flex-1 bg-red-50 text-red-600 px-3 py-2 rounded text-sm font-medium hover:bg-red-100 transition"
                   >
                     Eliminar
                   </button>
                 </div>
               </div>
-
+              
               <div
                 v-if="proveedoresFiltrados.length === 0"
                 class="text-center py-12 bg-gray-50 rounded-lg"
               >
-                <svg
-                  class="w-16 h-16 text-gray-400 mx-auto mb-4"
+              <svg
+              class="w-16 h-16 text-gray-400 mx-auto mb-4"
                   fill="none"
                   stroke="currentColor"
                   viewBox="0 0 24 24"
                 >
                   <path
-                    stroke-linecap="round"
-                    stroke-linejoin="round"
-                    stroke-width="2"
-                    d="M9.172 16.172a4 4 0 015.656 0M9 10h.01M15 10h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  stroke-width="2"
+                  d="M9.172 16.172a4 4 0 015.656 0M9 10h.01M15 10h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
                   ></path>
                 </svg>
                 <p class="text-gray-500 text-lg">
@@ -393,38 +392,38 @@
                 </p>
               </div>
             </div>
-
+            
             <!-- Vista de tabla para desktop -->
             <div
-              class="hidden lg:block bg-white rounded-lg border border-gray-200 overflow-hidden"
+            class="hidden lg:block bg-white rounded-lg border border-gray-200 overflow-hidden"
             >
-              <table class="w-full">
-                <thead class="bg-gray-50">
-                  <tr>
-                    <th
-                      class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+            <table class="w-full">
+              <thead class="bg-gray-50">
+                <tr>
+                  <th
+                  class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
                     >
-                      Proveedor
+                    Proveedor
                     </th>
                     <th
-                      class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+                    class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
                     >
-                      Contacto
+                    Contacto
                     </th>
                     <th
-                      class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+                    class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
                     >
-                      Teléfono
-                    </th>
-                    <th
-                      class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
-                    >
+                    Teléfono
+                  </th>
+                  <th
+                  class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+                  >
                       Email
                     </th>
                     <th
-                      class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+                    class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
                     >
-                      Acciones
+                    Acciones
                     </th>
                   </tr>
                 </thead>
@@ -434,10 +433,10 @@
                     :key="index"
                     class="hover:bg-gray-50 transition"
                   >
-                    <td class="px-6 py-4 whitespace-nowrap">
-                      <div class="flex items-center">
+                  <td class="px-6 py-4 whitespace-nowrap">
+                    <div class="flex items-center">
                         <div
-                          class="w-10 h-10 bg-green-100 rounded-lg flex items-center justify-center flex-shrink-0"
+                        class="w-10 h-10 bg-green-100 rounded-lg flex items-center justify-center flex-shrink-0"
                         >
                           <svg
                             class="w-5 h-5 text-green-600"
@@ -445,20 +444,20 @@
                             stroke="currentColor"
                             viewBox="0 0 24 24"
                           >
-                            <path
-                              stroke-linecap="round"
-                              stroke-linejoin="round"
-                              stroke-width="2"
+                          <path
+                          stroke-linecap="round"
+                          stroke-linejoin="round"
+                          stroke-width="2"
                               d="M17 9V7a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2m2 4h10a2 2 0 002-2v-6a2 2 0 00-2-2H9a2 2 0 00-2 2v6a2 2 0 002 2z"
                             ></path>
                           </svg>
                         </div>
                         <div class="ml-4">
                           <div class="text-sm font-medium text-gray-900">
-                            {{ proveedor.nombre_proveedor }}
+                            {{ proveedor.nombre_proveedor.substring(0, 15) }}
                           </div>
                           <div class="text-sm text-gray-500">
-                            {{ proveedor.direccion.substring(0, 30) }}...
+                            {{ proveedor.direccion.substring(0, 20) }}...
                           </div>
                         </div>
                       </div>
@@ -476,25 +475,25 @@
                         {{ proveedor.telefono }}
                       </div>
                       <div
-                        v-if="proveedor.telefono_secundario"
-                        class="text-sm text-gray-500"
+                      v-if="proveedor.telefono_secundario"
+                      class="text-sm text-gray-500"
                       >
                         {{ proveedor.telefono_secundario }}
                       </div>
                     </td>
                     <td
-                      class="px-6 py-4 whitespace-nowrap text-sm text-gray-900"
+                    class="px-6 py-4 whitespace-nowrap text-sm text-gray-900"
                     >
-                      {{ proveedor.email || 'N/A' }}
-                    </td>
-                    <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
-                      <button
-                        @click="editarProveedor(index)"
-                        class="text-blue-600 hover:text-blue-900 mr-3"
-                      >
-                        Editar
-                      </button>
-                      <button
+                    {{ proveedor.email || 'N/A' }}
+                  </td>
+                  <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
+                    <button
+                    @click="editarProveedor(index)"
+                    class="text-blue-600 hover:text-blue-900 mr-3"
+                    >
+                    Editar
+                  </button>
+                  <button
                         @click="eliminarProveedor(index)"
                         class="text-red-600 hover:text-red-900"
                       >

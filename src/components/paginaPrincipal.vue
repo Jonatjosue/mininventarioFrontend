@@ -25,7 +25,7 @@
           </div>
         </div>
 
-        <nav class="flex flex-wrap justify-center gap-2 md:gap-4">
+        <nav class="flex flex-wrap mt-2 justify-center gap-2 md:gap-4">
           <button
             @click="activeTab = 'inicio'"
             :class="[

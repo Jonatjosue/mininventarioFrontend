@@ -57,7 +57,7 @@
     </header>
 
     <!-- Main Content -->
-    <main class="max-w-7xl mx-auto">
+    <main class="max-w-7xl mx-auto pb-7">
       <div class="bg-white rounded-2xl shadow-xl overflow-hidden">
         <!-- Tabs Mejoradas -->
         <div class="border-b border-gray-200">
@@ -105,7 +105,7 @@
         </div>
 
         <!-- Content -->
-        <div class="p-6">
+        <div class="p-6 mb-4">
           <!-- Agregar Producto -->
           <div v-if="tab === 'agregar'" class="space-y-6">
             <!--Mensajes de alerta-->
@@ -158,6 +158,20 @@
               >
                 Agregar Proveedor
               </a>
+            </div>
+            <div class="w-full">
+              <h5
+                v-if="nuevoProducto.publicado"
+                class="flex items-center gap-2 text-white font-semibold bg-green-500 px-3 py-2 rounded-lg shadow-md text-sm"
+              >
+                Producto Visible
+              </h5>
+              <h5
+                v-else
+                class="flex items-center gap-2 text-white font-semibold bg-gray-500 px-3 py-2 rounded-lg shadow-md text-sm"
+              >
+                Producto Oculto
+              </h5>
             </div>
 
             <!--Mensajes de alerta-->
@@ -316,14 +330,16 @@
                 class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                 placeholder="Describe las características del producto..."
               ></textarea>
-              <div class="mt-2 pt-3 border-t-2 flex flex-row justify-between">
+              <div
+                class="mt-2 pt-3 border-t-2 flex flex-col md:flex-row justify-between gap-2 md:justify-between"
+              >
                 <div class="flex flex-row">
                   <button
-                    class="btn btn-secondary flex items-center gap-2 bg-slate-500 hover:bg-gray-700 border-gray-500 text-white rounded-lg shadow-none focus:outline-none focus:ring-0"
+                    class="btn btn-secondary flex items-center gap-2 md:gap-2 bg-slate-500 hover:bg-gray-700 border-gray-500 text-white rounded-lg shadow-none focus:outline-none focus:ring-0"
                     @click="nuevoProducto.publicado = !nuevoProducto.publicado"
                   >
                     <!-- Estado Publicar -->
-                    <template v-if="nuevoProducto.publicado">
+                    <template v-if="!nuevoProducto.publicado">
                       <span>Publicar</span>
                       <svg
                         viewBox="0 0 20 20"
@@ -478,7 +494,7 @@
 
             <!-- Vista de tabla para desktop -->
             <div
-              class="hidden lg:block bg-white rounded-lg border border-gray-200 overflow-hidden"
+              class="hidden lg:block bg-white rounded-lg border border-gray-200 overflow-auto"
             >
               <table class="w-full">
                 <thead class="bg-gray-50">
@@ -517,7 +533,7 @@
                 </thead>
                 <tbody class="bg-white divide-y divide-gray-200">
                   <tr
-                    v-for="(producto, index) in productosFiltrados"
+                    v-for="(producto, index) in productosPaginadosProductos"
                     :key="index"
                     class="hover:bg-gray-50 transition"
                   >
@@ -623,7 +639,7 @@
               </table>
 
               <div
-                v-if="productosFiltrados.length === 0"
+                v-if="productosPaginadosProductos.length === 0"
                 class="text-center py-12"
               >
                 <svg
@@ -775,17 +791,35 @@
               </span>
               <div class="flex space-x-2">
                 <button
-                  class="px-3 py-1 border border-gray-300 rounded text-sm hover:bg-gray-50 transition"
+                  :disabled="paginaActualProductos - 1 === 0"
+                  @click="paginaActualProductos--"
+                  class="px-3 py-1 border disabled:bg-gray-300 disabled:border-gray-300 text-gray-600 border-gray-300 rounded text-sm hover:bg-gray-50 transition"
                 >
                   Anterior
                 </button>
                 <button
-                  class="px-3 py-1 border border-blue-500 bg-blue-500 text-white rounded text-sm"
+                  :disabled="paginaActualProductos - 1 === 0"
+                  @click="paginaActualProductos--"
+                  class="px-3 py-1 border disabled:bg-gray-300 disabled:border-gray-300 border-blue-300 bg-blue-300 hover:bg-blue-600 text-white rounded text-sm"
                 >
-                  1
+                  {{ paginaActualProductos - 1 }}
                 </button>
                 <button
-                  class="px-3 py-1 border border-gray-300 rounded text-sm hover:bg-gray-50 transition"
+                  class="px-3 py-1 border border-blue-500 bg-blue-500 hover:bg-blue-600 text-white rounded text-sm"
+                >
+                  {{ paginaActualProductos }}
+                </button>
+                <button
+                  :disabled="productosPaginadosProductos.length === 0"
+                  @click="paginaActualProductos++"
+                  class="px-3 py-1 border disabled:bg-gray-300 border-blue-300 bg-blue-300 hover:bg-blue-600 text-white rounded text-sm"
+                >
+                  {{ paginaActualProductos + 1 }}
+                </button>
+                <button
+                  :disabled="productosPaginadosProductos.length === 0"
+                  @click="paginaActualProductos++"
+                  class="px-3 py-1 border disabled:bg-gray-300 text-gray-600 border-gray-300 rounded text-sm hover:bg-gray-50 transition"
                 >
                   Siguiente
                 </button>
@@ -1712,6 +1746,8 @@ export default {
     return {
       publicar: false,
       paginaActual: 1,
+      paginaActualProductos: 1,
+      productosPorPaginaPr: 6,
       productosPorPagina: 5,
       aplica_por_porcentaje: false,
       tab: 'agregar',
@@ -1781,6 +1817,19 @@ export default {
       const fin = inicio + this.productosPorPagina;
       return this.productosConOfertasFiltrados.slice(inicio, fin);
     },
+    /**   paginaActualProductos:1,
+      productosPorPaginaPr:5, */
+    productosPaginadosProductos() {
+      const inicio =
+        (this.paginaActualProductos - 1) * this.productosPorPaginaPr;
+      const fin = inicio + this.productosPorPaginaPr;
+      return this.productosFiltrados.slice(inicio, fin);
+    },
+    totalPaginasProductos() {
+      return Math.ceil(
+        this.productosFiltrados.length / this.productosPorPaginaPr
+      );
+    },
     totalPaginas() {
       return Math.ceil(
         this.productosConOfertasFiltrados.length / this.productosPorPagina
@@ -1836,7 +1885,7 @@ export default {
           producto.nombre
             .toLowerCase()
             .includes(this.filtroBusqueda.toLowerCase()) ||
-          producto.sku
+          producto.codigo
             ?.toLowerCase()
             .includes(this.filtroBusqueda.toLowerCase());
         const coincideCategoria =

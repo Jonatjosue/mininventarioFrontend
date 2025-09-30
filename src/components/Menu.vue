@@ -1,5 +1,5 @@
 <template>
-  <div class="flex z-30">
+  <div class="">
     <aside
       :class="[
         'fixed top-0 left-0 h-full bg-slate-700 shadow-lg z-40 flex flex-col transition-all duration-300 ease-in-out overflow-hidden',
@@ -29,7 +29,7 @@
       </div>
 
       <!-- Buscador -->
-      <div v-show="abierto" :class="['p-4', esMovil ? 'block mt-16' : 'block']">
+      <div v-show="abierto" :class="['p-4', esMovil ? 'block mt-5' : 'block']">
         <div class="relative">
           <input
             type="text"
@@ -128,16 +128,37 @@
     ></div>
 
     <!-- Contenido principal -->
-    <div class="flex-1 flex flex-col min-h-screen">
+    <div class="border border-e-red-900">
       <!-- Botón hamburguesa SOLO en móvil -->
       <button
         @click="toggleMenu"
-        class="lg:hidden fixed top-4 left-4 z-50 p-2 rounded-md bg-primary text-white shadow-md hover:bg-primary-dark transition focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2"
+        :class="[
+          'lg:hidden z-50   bg-primary text-white shadow-md hover:bg-primary-dark transition focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2',
+          abierto
+            ? 'bottom-4 right-7 fixed rounded-md p-2'
+            : ' fixed  rounded-md bottom-5 left-5 p-2 ',
+          !mostrarMensajeYBounce ? 'animate-bounce' : '',
+        ]"
         :aria-label="abierto ? 'Cerrar menú' : 'Abrir menú'"
       >
-        <Bars3Icon v-if="!abierto" class="w-6 h-6 text-white" />
-        <XMarkIcon v-else class="w-6 h-6 text-white" />
+        <Bars3Icon
+          v-if="!abierto"
+          class="bg-primary rounded-md bottom-6 left-1 bg-opacity-75 h-5 text-white"
+        />
+        <XMarkIcon v-else class="w-6 h-6 text-white 0" />
       </button>
+
+      <transition name="fade-slide">
+        <div
+          v-if="!abierto && mostrarMensaje && esMovil"
+          :class="[
+            ' fixed bottom-14 left-5 bg-gray-800 text-white px-3 py-1 rounded-md shadow-md text-sm',
+            !mostrarMensajeYBounce ? 'animate-bounce' : 'animate-fadeoutdown',
+          ]"
+        >
+          Click para ver menú
+        </div>
+      </transition>
     </div>
   </div>
 </template>
@@ -169,6 +190,8 @@ export default {
   },
   data() {
     return {
+      mostrarMensaje: true,
+      mostrarMensajeYBounce: false,
       busqueda: '',
       abierto: false,
       esMovil: false,
@@ -207,11 +230,25 @@ export default {
     this.checkViewport();
     this.debouncedCheckViewport = debounce(this.checkViewport, 250);
     window.addEventListener('resize', this.debouncedCheckViewport);
+    setTimeout(() => {
+      this.mostrarMensajeYBounce = true;
+    }, 2000);
   },
   beforeUnmount() {
     if (this.debouncedCheckViewport) {
       window.removeEventListener('resize', this.debouncedCheckViewport);
     }
+  },
+  watch: {
+    mostrarMensajeYBounce(nuevoValor) {
+      if (nuevoValor) {
+        setTimeout(() => {
+          this.mostrarMensaje = false;
+        }, 500);
+      } else {
+        this.mostrarMensaje = true;
+      }
+    },
   },
   methods: {
     getRouteTitle(ruta) {
@@ -232,8 +269,14 @@ export default {
     mostrarAlertaExito(mensaje) {
       mostrarAlertaGlobal(mensaje, 'success', 'sm', 'top-center', 300);
     },
-    toggleMenu() {
+    async toggleMenu() {
       this.abierto = !this.abierto;
+
+      if (!this.abierto) {
+        await setTimeout(() => {
+          this.mostrarMensajeYBounce = true;
+        }, 2000);
+      }
     },
     cerrarEnMovil() {
       if (this.esMovil) this.abierto = false;

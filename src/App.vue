@@ -5,7 +5,6 @@ import Menu from './components/Menu.vue';
 import { useRoute } from 'vue-router';
 import { computed, ref } from 'vue';
 
-
 const route = useRoute();
 
 const esMovil = ref(false);
@@ -20,7 +19,7 @@ const mostrarPrincipal = computed(() => route.path === '/');
 </script>
 
 <template>
-  <div class="flex h-screen">
+  <div class="flex h-screen" data-theme="dark">
     <!-- Menú lateral -->
     <Menu
       v-if="mostrarMenu"

@@ -1,14 +1,14 @@
 <template>
-  <div
-    class="min-h-screen bg-gradiente-personal from-gray-50 to-orange-100 p-4"
-  >
+  <div class="bg-gradiente-personal from-gray-50 to-orange-100">
     <!-- Header -->
-    <header class="bg-white shadow-sm rounded-lg mb-6">
-      <div class="max-w-7xl mx-auto px-4 py-4 sm:px-6 lg:px-8">
-        <div class="flex items-center justify-between">
-          <div class="flex items-center space-x-4">
+    <header class="bg-white shadow-sm rounded-lg mb-6 mx-8">
+      <div class="px-4 py-4 sm:px-6 lg:px-8">
+        <div
+          class="flex flex-col md:flex-row gap-1 items-center justify-between"
+        >
+          <div class="flex items-center">
             <div
-              class="w-12 h-12 bg-gradient-to-r from-blue-500 to-indigo-600 rounded-lg flex items-center justify-center"
+              class="w-12 h-12 bg-gradient-to-r from-blue-500 to-indigo-600 rounded-lg flex gap-1 items-center justify-center"
             >
               <svg
                 class="w-6 h-6 text-white"
@@ -33,7 +33,7 @@
               </p>
             </div>
           </div>
-          <div class="flex items-center space-x-4">
+          <div class="flex items-center gap-1">
             <div class="relative">
               <svg
                 class="w-5 h-5 text-gray-400 absolute left-3 top-1/2 transform -translate-y-1/2"
@@ -65,9 +65,9 @@
     </header>
 
     <!-- Main Content -->
-    <main class="max-w-7xl mx-auto">
+    <main class="max-w-full mx-5 md:mx-14">
       <!-- Dashboard Cards -->
-      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-6">
+      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8 mb-6">
         <!-- Card: Total Productos -->
         <div class="bg-white rounded-xl shadow-md p-6">
           <div class="flex items-center">
@@ -308,101 +308,118 @@
           </p>
         </div>
         <div class="overflow-x-auto">
-          <table class="min-w-full divide-y divide-gray-200">
-            <thead class="bg-gray-50">
-              <tr>
-                <th
-                  scope="col"
-                  class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
-                >
-                  Producto
-                </th>
-                <th
-                  scope="col"
-                  class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
-                >
-                  Categoría
-                </th>
-                <th
-                  scope="col"
-                  class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
-                >
-                  Stock Actual
-                </th>
-                <th
-                  scope="col"
-                  class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
-                >
-                  Stock Mínimo
-                </th>
-                <th
-                  scope="col"
-                  class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
-                >
-                  Estado
-                </th>
-                <th
-                  scope="col"
-                  class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
-                >
-                  Acciones
-                </th>
-              </tr>
-            </thead>
-            <tbody class="bg-white divide-y divide-gray-200">
-              <tr v-for="producto in productosCriticos" :key="producto.id">
-                <td class="px-6 py-4 whitespace-nowrap">
-                  <div class="flex items-center">
-                    <div class="flex-shrink-0 h-10 w-10">
-                      <img
-                        class="h-10 w-10 rounded-full object-cover"
-                        :src="
-                          producto.imagen || 'https://via.placeholder.com/40'
-                        "
-                        alt=""
-                      />
-                    </div>
-                    <div class="ml-4">
-                      <div class="text-sm font-medium text-gray-900">
-                        {{ producto.nombre }}
-                      </div>
-                      <div class="text-sm text-gray-500">
-                        {{ producto.codigo }}
-                      </div>
-                    </div>
-                  </div>
-                </td>
-                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                  {{ producto.categoria }}
-                </td>
-                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                  {{ producto.stock }}
-                </td>
-                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                  {{ producto.stock_minimo }}
-                </td>
-                <td class="px-6 py-4 whitespace-nowrap">
-                  <span
-                    class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-red-100 text-red-800"
+          <div class="w-2 md:min-w-full">
+            <table class="min-w-full divide-y divide-gray-200">
+              <thead class="bg-gray-50">
+                <tr>
+                  <th
+                    scope="col"
+                    class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
                   >
-                    Crítico
-                  </span>
-                </td>
-                <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
-                  <button class="text-indigo-600 hover:text-indigo-900 mr-3">
-                    Reabastecer
-                  </button>
-                  <button class="text-gray-600 hover:text-gray-900">
-                    Detalles
-                  </button>
-                </td>
-              </tr>
-            </tbody>
-          </table>
+                    Producto
+                  </th>
+                  <th
+                    scope="col"
+                    class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+                  >
+                    Categoría
+                  </th>
+                  <th
+                    scope="col"
+                    class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+                  >
+                    Stock Actual
+                  </th>
+                  <th
+                    scope="col"
+                    class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+                  >
+                    Stock Mínimo
+                  </th>
+                  <th
+                    scope="col"
+                    class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+                  >
+                    Estado
+                  </th>
+                  <th
+                    scope="col"
+                    class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+                  >
+                    Acciones
+                  </th>
+                </tr>
+              </thead>
+              <tbody class="bg-white divide-y divide-gray-200">
+                <tr v-for="producto in productosCriticos" :key="producto.id">
+                  <td class="px-6 py-4">
+                    <div class="flex items-center">
+                      <div class="flex-shrink-0 h-10 w-10">
+                        <img
+                        v-if="producto.imagen"
+                          class="h-10 w-10 rounded-full object-cover"
+                          :src="producto.imagen || ''"
+                          alt=""
+                        />
+                        <svg
+                  v-else
+                  data-v-0da8fd7f=""
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  stroke-width="1.5"
+                  stroke="currentColor"
+                  class="size-8 text-gray-500"
+                >
+                  <path
+                    data-v-0da8fd7f=""
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    d="m2.25 15.75 5.159-5.159a2.25 2.25 0 0 1 3.182 0l5.159 5.159m-1.5-1.5 1.409-1.409a2.25 2.25 0 0 1 3.182 0l2.909 2.909m-18 3.75h16.5a1.5 1.5 0 0 0 1.5-1.5V6a1.5 1.5 0 0 0-1.5-1.5H3.75A1.5 1.5 0 0 0 2.25 6v12a1.5 1.5 0 0 0 1.5 1.5Zm10.5-11.25h.008v.008h-.008V8.25Zm.375 0a.375.375 0 1 1-.75 0 .375.375 0 0 1 .75 0Z"
+                  ></path>
+                </svg>
+                      </div>
+                      <div class="ml-4">
+                        <div class="text-sm font-medium text-gray-900">
+                          {{ producto.nombre }}
+                        </div>
+                        <div class="text-sm text-gray-500">
+                          {{ producto.codigo }}
+                        </div>
+                      </div>
+                    </div>
+                  </td>
+                  <td class="px-6 py-4 text-sm text-gray-500">
+                    {{ producto.categoria }}
+                  </td>
+                  <td class="px-6 py-4 text-sm text-gray-500">
+                    {{ producto.stock }}
+                  </td>
+                  <td class="px-6 py-4 text-sm text-gray-500">
+                    {{ producto.stock_minimo }}
+                  </td>
+                  <td class="px-6 py-4">
+                    <span
+                      class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-red-100 text-red-800"
+                    >
+                      Crítico
+                    </span>
+                  </td>
+                  <td class="px-6 py-4 text-sm font-medium">
+                    <button class="text-indigo-600 hover:text-indigo-900 mr-3">
+                      Reabastecer
+                    </button>
+                    <button class="text-gray-600 hover:text-gray-900">
+                      Detalles
+                    </button>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
         </div>
       </div>
 
-      <div class="bg-white rounded-xl shadow-md overflow-hidden">
+      <div class="bg-white mb-10 rounded-xl shadow-md overflow-hidden">
         <div class="px-6 py-4 border-b border-gray-200">
           <h2 class="text-lg font-semibold text-gray-900">
             Últimos Movimientos
@@ -412,75 +429,80 @@
           </p>
         </div>
         <div class="overflow-x-auto">
-          <table class="min-w-full divide-y divide-gray-200">
-            <thead class="bg-gray-50">
-              <tr>
-                <th
-                  scope="col"
-                  class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
-                >
-                  Fecha
-                </th>
-                <th
-                  scope="col"
-                  class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
-                >
-                  Producto
-                </th>
-                <th
-                  scope="col"
-                  class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
-                >
-                  Tipo
-                </th>
-                <th
-                  scope="col"
-                  class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
-                >
-                  Cantidad
-                </th>
-                <th
-                  scope="col"
-                  class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
-                >
-                  Usuario
-                </th>
-              </tr>
-            </thead>
-            <tbody class="bg-white divide-y divide-gray-200">
-              <tr v-for="movimiento in ultimosMovimientos" :key="movimiento.id">
-                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                  {{ formatoFecha(movimiento.fecha) }}
-                </td>
-                <td class="px-6 py-4 whitespace-nowrap">
-                  <div class="text-sm font-medium text-gray-900">
-                    {{ movimiento.producto }}
-                  </div>
-                  <div class="text-sm text-gray-500">
-                    {{ movimiento.codigo }}
-                  </div>
-                </td>
-                <td class="px-6 py-4 whitespace-nowrap">
-                  <span
-                    :class="[
-                      'px-2 inline-flex text-xs leading-5 font-semibold rounded-full',
-                      movimiento.tipo === 'entrada'
-                        ? 'bg-green-100 text-green-800'
-                        : 'bg-red-100 text-red-800',
-                    ]"
+          <div class="w-2 md:min-w-full">
+            <table class="min-w-full divide-y divide-gray-200">
+              <thead class="bg-gray-50">
+                <tr>
+                  <th
+                    scope="col"
+                    class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
                   >
-                    {{ movimiento.tipo === 'entrada' ? 'Entrada' : 'Salida' }}
-                  </span>
-                </td>
-                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                  {{ movimiento.cantidad }}
-                </td>
-                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                  {{ movimiento.usuario }}
-                </td>
-              </tr>
-            </tbody>
-          </table>
+                    Fecha
+                  </th>
+                  <th
+                    scope="col"
+                    class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+                  >
+                    Producto
+                  </th>
+                  <th
+                    scope="col"
+                    class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+                  >
+                    Tipo
+                  </th>
+                  <th
+                    scope="col"
+                    class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+                  >
+                    Cantidad
+                  </th>
+                  <th
+                    scope="col"
+                    class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+                  >
+                    Usuario
+                  </th>
+                </tr>
+              </thead>
+              <tbody class="bg-white divide-y divide-gray-200">
+                <tr
+                  v-for="movimiento in ultimosMovimientos"
+                  :key="movimiento.id"
+                >
+                  <td class="px-6 py-4 text-sm text-gray-500">
+                    {{ formatoFecha(movimiento.fecha) }}
+                  </td>
+                  <td class="px-6 py-4">
+                    <div class="text-sm font-medium text-gray-900">
+                      {{ movimiento.producto }}
+                    </div>
+                    <div class="text-sm text-gray-500">
+                      {{ movimiento.codigo }}
+                    </div>
+                  </td>
+                  <td class="px-6 py-4">
+                    <span
+                      :class="[
+                        'px-2 inline-flex text-xs leading-5 font-semibold rounded-full',
+                        movimiento.tipo === 'entrada'
+                          ? 'bg-green-100 text-green-800'
+                          : 'bg-red-100 text-red-800',
+                      ]"
+                    >
+                      {{ movimiento.tipo === 'entrada' ? 'Entrada' : 'Salida' }}
+                    </span>
+                  </td>
+                  <td class="px-6 py-4 text-sm text-gray-500">
+                    {{ movimiento.cantidad }}
+                  </td>
+                  <td class="px-6 py-4 text-sm text-gray-500">
+                    {{ movimiento.usuario }}
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
         </div>
       </div>
     </main>
@@ -510,7 +532,7 @@ export default {
           categoria: 'Monitores',
           stock: 2,
           stock_minimo: 5,
-          imagen: 'https://via.placeholder.com/40',
+          imagen: '',
         },
         {
           id: 2,
@@ -519,7 +541,7 @@ export default {
           categoria: 'Periféricos',
           stock: 3,
           stock_minimo: 10,
-          imagen: 'https://via.placeholder.com/40',
+          imagen: '',
         },
         {
           id: 3,
@@ -528,7 +550,7 @@ export default {
           categoria: 'Periféricos',
           stock: 4,
           stock_minimo: 8,
-          imagen: 'https://via.placeholder.com/40',
+          imagen: '',
         },
         {
           id: 4,
@@ -537,7 +559,7 @@ export default {
           categoria: 'Almacenamiento',
           stock: 1,
           stock_minimo: 5,
-          imagen: 'https://via.placeholder.com/40',
+          imagen: '',
         },
       ],
       ultimosMovimientos: [

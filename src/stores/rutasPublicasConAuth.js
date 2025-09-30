@@ -11,6 +11,17 @@ function cargarRutasInicioPublicasConAuth() {
         allowed: true,
       },
     },
+    {
+      path: '/facturacionCliente',
+      name: 'Ventas',
+      meta: {
+        group: 'Venta',
+        title: 'Ventas',
+        icon: 'Home',
+        requiresAuth: true,
+        allowed: true,
+      },
+    },
     /*   {
       path: '/IngresoPedidos',
       name: 'Pedidos',
