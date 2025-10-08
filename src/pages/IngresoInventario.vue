@@ -25,10 +25,10 @@
               </svg>
             </div>
             <div>
-              <h1 class="text-2xl font-bold text-gray-900">
-                Ingreso de Facturas
+              <h1 class="text-xl md:text-2xl font-bold text-gray-900">
+                Ingreso de Facturas Proveedores
               </h1>
-              <p class="text-sm text-gray-600">
+              <p class="text-xs md:text-sm text-gray-600">
                 Registrar productos a través de facturas de compra
               </p>
             </div>
@@ -40,24 +40,22 @@
     <!-- Main Content -->
     <main class="max-w-7xl mx-auto">
       <div class="bg-white rounded-2xl shadow-xl overflow-hidden">
-        <!-- Content -->
-
         <!-- Tabs -->
         <div class="border-b border-gray-200">
-          <nav class="flex space-x-8 px-5">
+          <nav class="flex overflow-x-auto px-2 md:px-5">
             <button
               v-for="(tabItem, index) in tabs"
               :key="index"
               @click="tab = tabItem.id"
               :class="[
-                'py-4 px-1 border-b-2 font-medium text-sm flex items-center space-x-2 transition',
+                'py-4 px-2 md:px-3 border-b-2 font-medium text-sm flex items-center space-x-2 transition whitespace-nowrap',
                 tab === tabItem.id
                   ? 'border-orange-500 text-orange-600'
                   : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300',
               ]"
             >
-              <component :is="tabItem.icon" class="w-5 h-5" />
-              <span>{{ tabItem.label }}</span>
+              <component :is="tabItem.icon" class="w-4 h-4 md:w-5 md:h-5" />
+              <span class="text-xs md:text-sm">{{ tabItem.label }}</span>
               <span
                 v-if="tabItem.count !== undefined"
                 class="bg-gray-100 text-gray-600 px-2 py-1 rounded-full text-xs"
@@ -67,13 +65,14 @@
             </button>
           </nav>
         </div>
-        <!--Ingreso Factura-->
+
+        <!-- Ingreso Factura -->
         <div v-if="tab === 'IFactura'" class="p-1">
           <!-- Notificación -->
           <div
             v-if="mensaje.texto"
             :class="[
-              'rounded-lg p-4 mb-4 flex items-center justify-between',
+              'rounded-lg p-4 mb-4 flex items-center justify-between mx-4 md:mx-6',
               mensaje.tipo === 'exito'
                 ? 'bg-green-100 text-green-800'
                 : 'bg-red-100 text-red-800',
@@ -108,7 +107,7 @@
                   d="M6 18L18 6M6 6l12 12"
                 ></path>
               </svg>
-              <span>{{ mensaje.texto }}</span>
+              <span class="text-sm">{{ mensaje.texto }}</span>
             </div>
             <button
               @click="mensaje.texto = ''"
@@ -119,19 +118,21 @@
           </div>
 
           <!-- Datos de Factura -->
-          <div class="p-6">
-            <div class="flex flex-row justify-between mb-5">
-              <h2 class="text-xl font-semibold text-gray-900 mb-4">
+          <div class="p-4 md:p-6">
+            <div
+              class="flex flex-col md:flex-row justify-between mb-5 space-y-4 md:space-y-0"
+            >
+              <h2 class="text-lg md:text-xl font-semibold text-gray-900">
                 Datos de la Factura
               </h2>
               <div class="flex flex-col">
-                <label class="text-sm font-medium text-gray-700">
+                <label class="text-sm font-medium text-gray-700 mb-2">
                   Estado factura
                 </label>
                 <select
                   v-model="factura.id_estado_factura"
                   :disabled="bloquearCampos"
-                  class="disabled:bg-slate-600 py-1 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent"
+                  class="disabled:bg-slate-600 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent"
                   :class="{ 'border-red-500': errores.id_estado_factura }"
                 >
                   <option value="" disabled>Seleccione un estado</option>
@@ -145,8 +146,9 @@
                 </select>
               </div>
             </div>
+
             <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
-              <div>
+              <div class="md:col-span-3">
                 <label class="block text-sm font-medium text-gray-700 mb-2">
                   Proveedor *
                 </label>
@@ -186,6 +188,7 @@
                   {{ errores.numero }}
                 </p>
               </div>
+
               <div>
                 <label class="block text-sm font-medium text-gray-700 mb-2"
                   >Serie de Factura *</label
@@ -196,12 +199,13 @@
                   type="text"
                   class="disabled:bg-slate-600 w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent"
                   :class="{ 'border-red-500': errores.serie }"
-                  placeholder="Número de factura"
+                  placeholder="Serie de factura"
                 />
                 <p v-if="errores.serie" class="mt-1 text-sm text-red-600">
                   {{ errores.serie }}
                 </p>
               </div>
+
               <div>
                 <label class="block text-sm font-medium text-gray-700 mb-2"
                   >Fecha Emisión*</label
@@ -217,6 +221,7 @@
                   {{ errores.fecha }}
                 </p>
               </div>
+
               <div>
                 <label class="block text-sm font-medium text-gray-700 mb-2"
                   >Fecha Vencimiento</label
@@ -235,6 +240,7 @@
                   {{ errores.fechaVencimiento }}
                 </p>
               </div>
+
               <div>
                 <label class="block text-sm font-medium text-gray-700 mb-2"
                   >Tipo de pago</label
@@ -265,9 +271,9 @@
           </div>
 
           <!-- Detalle de Productos -->
-          <div class="p-6">
+          <div class="px-4 md:p-6">
             <div class="flex justify-between items-center mb-4">
-              <h2 class="text-xl font-semibold text-gray-900">
+              <h2 class="text-lg md:text-xl font-semibold text-gray-900">
                 Productos de la Factura
               </h2>
               <span class="text-sm text-gray-500"
@@ -275,200 +281,358 @@
               >
             </div>
 
-            <div class="overflow-x-auto">
-              <table class="w-full border-collapse border border-gray-200">
-                <thead class="bg-gray-100">
-                  <tr>
-                    <th
-                      class="border border-gray-300 p-3 text-left text-gray-600"
-                    >
-                      Producto
-                    </th>
-                    <th
-                      class="border border-gray-300 p-3 text-right text-gray-600"
-                    >
-                      Cantidad
-                    </th>
-                    <th
-                      class="border border-gray-300 p-3 text-right text-gray-600"
-                    >
-                      Precio Unitario
-                    </th>
-
-                    <th
-                      class="border border-gray-300 p-3 text-right text-gray-600"
-                    >
-                      Subtotal
-                    </th>
-                    <th
-                      class="border border-gray-300 p-3 text-right text-gray-600"
-                    >
-                      Descuento
-                    </th>
-                    <th
-                      class="border border-gray-300 p-3 text-right text-gray-600"
-                    >
-                      Es Lote
-                    </th>
-                    <th
-                      class="border border-gray-300 p-3 text-right text-gray-600"
-                    >
-                      Precio Lote
-                    </th>
-                    <th
-                      class="border border-gray-300 p-3 text-right text-gray-600"
-                    >
-                      Total
-                    </th>
-
-                    <th class="border border-gray-300 p-3"></th>
-                  </tr>
-                </thead>
-                <tbody>
-                  <tr v-for="(item, index) in factura.detalle" :key="index">
-                    <!-- Producto -->
-                    <td class="border border-gray-200 p-3">
-                      <select
-                        v-model="item.p_producto_Id"
-                        :disabled="bloquearCampos"
-                        class="disabled:bg-slate-600 w-full border border-gray-300 rounded px-3 py-2 focus:outline-none focus:ring-1 focus:ring-orange-500"
-                        @change="asignarPrecio(item)"
+            <!-- Versión Desktop - Tabla -->
+            <div
+              class="hidden md:block relative border border-gray-300 rounded-lg bg-white"
+            >
+              <div class="overflow-x-auto">
+                <table
+                  class="min-w-full border-collapse border border-gray-200"
+                >
+                  <thead class="bg-gray-100">
+                    <tr>
+                      <th
+                        class="border border-gray-300 p-3 text-left text-gray-600 whitespace-nowrap"
                       >
-                        <option disabled value="">
-                          Seleccione un producto
-                        </option>
-                        <option
-                          v-for="producto in productos"
-                          :key="producto.p_producto_Id"
-                          :value="producto.p_producto_Id"
+                        Producto
+                      </th>
+                      <th
+                        class="border border-gray-300 p-3 text-right text-gray-600 whitespace-nowrap"
+                      >
+                        Cantidad
+                      </th>
+                      <th
+                        class="border border-gray-300 p-3 text-right text-gray-600 whitespace-nowrap"
+                      >
+                        Precio Unitario
+                      </th>
+                      <th
+                        class="border border-gray-300 p-3 text-right text-gray-600 whitespace-nowrap"
+                      >
+                        Subtotal
+                      </th>
+                      <th
+                        class="border border-gray-300 p-3 text-right text-gray-600 whitespace-nowrap"
+                      >
+                        Descuento
+                      </th>
+                      <th
+                        class="border border-gray-300 p-3 text-center text-gray-600 whitespace-nowrap"
+                      >
+                        Es Lote
+                      </th>
+                      <th
+                        class="border border-gray-300 p-3 text-right text-gray-600 whitespace-nowrap"
+                      >
+                        Precio Lote
+                      </th>
+                      <th
+                        class="border border-gray-300 p-3 text-right text-gray-600 whitespace-nowrap"
+                      >
+                        Total
+                      </th>
+                      <th
+                        class="border border-gray-300 p-3 whitespace-nowrap"
+                      ></th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr v-for="(item, index) in factura.detalle" :key="index">
+                      <td class="border border-gray-200 p-3 whitespace-nowrap">
+                        <select
+                          v-model="item.p_producto_Id"
+                          :disabled="bloquearCampos"
+                          class="disabled:bg-slate-600 w-full border border-gray-300 rounded px-3 py-2 focus:outline-none focus:ring-1 focus:ring-orange-500"
+                          @change="asignarPrecio(item)"
                         >
-                          {{ producto.nombre }}
-                        </option>
-                      </select>
-                    </td>
+                          <option disabled value="">
+                            Seleccione un producto
+                          </option>
+                          <option
+                            v-for="producto in productos"
+                            :key="producto.p_producto_Id"
+                            :value="producto.p_producto_Id"
+                          >
+                            {{ producto.nombre }}
+                          </option>
+                        </select>
+                      </td>
+                      <td class="border border-gray-200 p-3 whitespace-nowrap">
+                        <input
+                          v-model.number="item.cantidad"
+                          type="number"
+                          :disabled="bloquearCampos"
+                          min="1"
+                          class="disabled:bg-slate-600 w-24 border border-gray-300 rounded px-3 py-2 text-right focus:outline-none focus:ring-1 focus:ring-orange-500"
+                          @change="validarCantidad(index, item)"
+                        />
+                      </td>
+                      <td class="border border-gray-200 p-3 whitespace-nowrap">
+                        <div class="relative">
+                          <span
+                            class="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-500"
+                            >Q</span
+                          >
+                          <input
+                            v-model.number="item.precio"
+                            :disabled="bloquearCampos"
+                            type="number"
+                            step="0.01"
+                            min="0"
+                            class="disabled:bg-slate-600 w-32 border border-gray-300 rounded px-3 py-2 pl-8 text-right focus:outline-none focus:ring-1 focus:ring-orange-500"
+                            @change="validarPrecio(index, item)"
+                          />
+                        </div>
+                      </td>
+                      <td
+                        class="border border-gray-200 p-3 text-right font-medium text-gray-700 whitespace-nowrap"
+                      >
+                        {{ formatoMoneda(item.cantidad * item.precio) }}
+                      </td>
+                      <td class="border border-gray-200 p-3 whitespace-nowrap">
+                        <div class="relative">
+                          <span
+                            class="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-500"
+                            >Q</span
+                          >
+                          <input
+                            v-model.number="item.descuento"
+                            type="number"
+                            :disabled="bloquearCampos"
+                            min="0"
+                            class="disabled:bg-slate-600 w-24 border border-gray-300 rounded px-3 py-2 text-right focus:outline-none focus:ring-1 focus:ring-orange-500"
+                            @change="actualizarTotal(item)"
+                          />
+                        </div>
+                      </td>
+                      <td
+                        class="border border-gray-200 p-3 text-center whitespace-nowrap"
+                      >
+                        <input
+                          type="checkbox"
+                          v-model="item.esLote"
+                          :disabled="bloquearCampos"
+                        />
+                      </td>
+                      <td class="border border-gray-200 p-3 whitespace-nowrap">
+                        <input
+                          :disabled="!item.esLote || bloquearCampos"
+                          v-model.number="item.precioLote"
+                          type="number"
+                          min="0"
+                          class="disabled:bg-slate-600 w-32 border border-gray-300 rounded px-3 py-2 text-right focus:outline-none focus:ring-1 focus:ring-orange-500"
+                        />
+                      </td>
+                      <td
+                        class="border border-gray-200 p-3 text-right font-medium text-gray-700 whitespace-nowrap"
+                      >
+                        {{ formatoMoneda(item.total ?? 0) }}
+                      </td>
+                      <td
+                        class="border border-gray-200 p-3 text-center whitespace-nowrap"
+                      >
+                        <button
+                          @click="confirmarEliminacion(index)"
+                          :disabled="bloquearCampos"
+                          class="disabled:text-gray-700 text-red-600 hover:text-red-800 p-2 rounded-full hover:bg-red-100 transition"
+                          title="Eliminar producto"
+                        >
+                          <svg
+                            class="w-5 h-5"
+                            fill="none"
+                            stroke="currentColor"
+                            viewBox="0 0 24 24"
+                          >
+                            <path
+                              stroke-linecap="round"
+                              stroke-linejoin="round"
+                              stroke-width="2"
+                              d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"
+                            ></path>
+                          </svg>
+                        </button>
+                      </td>
+                    </tr>
+                    <tr v-if="factura.detalle.length === 0">
+                      <td
+                        colspan="9"
+                        class="border border-gray-200 p-6 text-center text-gray-500"
+                      >
+                        No hay productos agregados. Haz clic en "Agregar
+                        Producto" para comenzar.
+                      </td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+            </div>
 
-                    <!-- Cantidad -->
-                    <td class="border border-gray-200 p-3">
+            <!-- Versión Mobile - Cards -->
+            <div class="md:hidden space-y-4">
+              <div
+                v-for="(item, index) in factura.detalle"
+                :key="index"
+                class="bg-white border border-gray-200 rounded-lg p-4 shadow-sm"
+              >
+                <div class="flex justify-between items-start mb-3">
+                  <div class="flex-1">
+                    <select
+                      v-model="item.p_producto_Id"
+                      :disabled="bloquearCampos"
+                      class="disabled:bg-slate-600 w-full border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-1 focus:ring-orange-500 text-base"
+                      @change="asignarPrecio(item)"
+                    >
+                      <option disabled value="">Seleccione un producto</option>
+                      <option
+                        v-for="producto in productos"
+                        :key="producto.p_producto_Id"
+                        :value="producto.p_producto_Id"
+                      >
+                        {{ producto.nombre }}
+                      </option>
+                    </select>
+                  </div>
+                  <button
+                    @click="confirmarEliminacion(index)"
+                    :disabled="bloquearCampos"
+                    class="disabled:text-gray-400 text-red-600 hover:text-red-800 p-2 rounded-full hover:bg-red-100 transition ml-2"
+                    title="Eliminar producto"
+                  >
+                    <svg
+                      class="w-5 h-5"
+                      fill="none"
+                      stroke="currentColor"
+                      viewBox="0 0 24 24"
+                    >
+                      <path
+                        stroke-linecap="round"
+                        stroke-linejoin="round"
+                        stroke-width="2"
+                        d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"
+                      ></path>
+                    </svg>
+                  </button>
+                </div>
+                <div class="grid grid-cols-2 gap-3">
+                  <div>
+                    <label class="block text-xs font-medium text-gray-500 mb-1"
+                      >Cantidad</label
+                    >
+                    <input
+                      v-model.number="item.cantidad"
+                      type="number"
+                      :disabled="bloquearCampos"
+                      min="1"
+                      class="disabled:bg-slate-600 w-full border border-gray-300 rounded px-3 py-2 text-right focus:outline-none focus:ring-1 focus:ring-orange-500"
+                      @change="validarCantidad(index, item)"
+                    />
+                  </div>
+                  <div>
+                    <label class="block text-xs font-medium text-gray-500 mb-1"
+                      >Precio Unitario</label
+                    >
+                    <div class="relative">
+                      <span
+                        class="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-500 text-sm"
+                        >Q</span
+                      >
                       <input
-                        v-model.number="item.cantidad"
+                        v-model.number="item.precio"
+                        :disabled="bloquearCampos"
+                        type="number"
+                        step="0.01"
+                        min="0"
+                        class="disabled:bg-slate-600 w-full border border-gray-300 rounded px-3 py-2 pl-8 text-right focus:outline-none focus:ring-1 focus:ring-orange-500"
+                        @change="validarPrecio(index, item)"
+                      />
+                    </div>
+                  </div>
+                  <div>
+                    <label class="block text-xs font-medium text-gray-500 mb-1"
+                      >Subtotal</label
+                    >
+                    <div
+                      class="w-full border border-gray-300 rounded px-3 py-2 text-right bg-gray-50"
+                    >
+                      <span class="font-medium text-gray-700">{{
+                        formatoMoneda(item.cantidad * item.precio)
+                      }}</span>
+                    </div>
+                  </div>
+                  <div>
+                    <label class="block text-xs font-medium text-gray-500 mb-1"
+                      >Descuento</label
+                    >
+                    <div class="relative">
+                      <span
+                        class="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-500 text-sm"
+                        >Q</span
+                      >
+                      <input
+                        v-model.number="item.descuento"
                         type="number"
                         :disabled="bloquearCampos"
-                        min="1"
-                        class="disabled:bg-slate-600 w-full border border-gray-300 rounded px-3 py-2 text-right focus:outline-none focus:ring-1 focus:ring-orange-500"
-                        @change="validarCantidad(index, item)"
-                      />
-                    </td>
-
-                    <!-- Precio Unitario -->
-                    <td class="border border-gray-200 p-3">
-                      <div class="relative">
-                        <span
-                          class="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-500"
-                          >Q</span
-                        >
-                        <input
-                          v-model.number="item.precio"
-                          :disabled="bloquearCampos"
-                          type="number"
-                          step="0.01"
-                          min="0"
-                          class="disabled:bg-slate-600 w-full border border-gray-300 rounded px-3 py-2 pl-8 text-right focus:outline-none focus:ring-1 focus:ring-orange-500"
-                          @change="validarPrecio(index, item)"
-                        />
-                      </div>
-                    </td>
-
-                    <!-- Subtotal -->
-                    <td
-                      class="border border-gray-200 p-3 text-right font-medium text-gray-700"
-                    >
-                      {{ formatoMoneda(item.cantidad * item.precio) }}
-                    </td>
-
-                    <!-- Descuento -->
-                    <td class="border border-gray-200 p-3">
-                      <div class="relative">
-                        <span
-                          class="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-500"
-                          >Q</span
-                        >
-                        <input
-                          v-model.number="item.descuento"
-                          type="number"
-                          :disabled="bloquearCampos"
-                          min="0"
-                          class="disabled:bg-slate-600 w-full border border-gray-300 rounded px-3 py-2 text-right focus:outline-none focus:ring-1 focus:ring-orange-500"
-                          @change="actualizarTotal(item)"
-                        />
-                      </div>
-                    </td>
-
-                    <!-- Es Lote -->
-                    <td class="border border-gray-200 p-3 text-center">
-                      <input type="checkbox" v-model="item.esLote" />
-                    </td>
-
-                    <!-- Precio Lote -->
-                    <td class="border border-gray-200 p-3">
-                      <input
-                        :disabled="!item.esLote || bloquearCampos"
-                        v-model.number="item.precioLote"
-                        type="number"
                         min="0"
                         class="disabled:bg-slate-600 w-full border border-gray-300 rounded px-3 py-2 text-right focus:outline-none focus:ring-1 focus:ring-orange-500"
+                        @change="actualizarTotal(item)"
                       />
-                    </td>
-
-                    <!-- Total -->
-                    <td
-                      class="border border-gray-200 p-3 text-right font-medium text-gray-700"
-                    >
-                      {{ formatoMoneda(item.total ?? 0) }}
-                    </td>
-
-                    <!-- Acciones -->
-                    <td class="border border-gray-200 p-3 text-center">
-                      <button
-                        @click="confirmarEliminacion(index)"
-                        :disabled="bloquearCampos"
-                        class="disabled:text-gray-700 text-red-600 hover:text-red-800 p-2 rounded-full hover:bg-red-100 transition"
-                        title="Eliminar producto"
-                      >
-                        <svg
-                          class="w-5 h-5"
-                          fill="none"
-                          stroke="currentColor"
-                          viewBox="0 0 24 24"
+                    </div>
+                  </div>
+                  <div class="col-span-2">
+                    <div class="flex items-center justify-between">
+                      <div class="flex items-center">
+                        <input
+                          type="checkbox"
+                          v-model="item.esLote"
+                          :disabled="bloquearCampos"
+                          class="w-4 h-4 text-orange-600 focus:ring-orange-500 border-gray-300 rounded disabled:bg-gray-100 mr-2"
+                        />
+                        <label class="text-sm font-medium text-gray-700"
+                          >Es Lote</label
                         >
-                          <path
-                            stroke-linecap="round"
-                            stroke-linejoin="round"
-                            stroke-width="2"
-                            d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"
-                          ></path>
-                        </svg>
-                      </button>
-                    </td>
-                  </tr>
-
-                  <!-- Cuando no hay productos -->
-                  <tr v-if="factura.detalle.length === 0">
-                    <td
-                      colspan="9"
-                      class="border border-gray-200 p-6 text-center text-gray-500"
-                    >
-                      No hay productos agregados. Haz clic en "Agregar Producto"
-                      para comenzar.
-                    </td>
-                  </tr>
-                </tbody>
-              </table>
+                      </div>
+                      <div class="flex-1 ml-4">
+                        <label
+                          class="block text-xs font-medium text-gray-500 mb-1"
+                          >Precio Lote</label
+                        >
+                        <input
+                          :disabled="!item.esLote || bloquearCampos"
+                          v-model.number="item.precioLote"
+                          type="number"
+                          min="0"
+                          class="disabled:bg-slate-600 w-full border border-gray-300 rounded px-3 py-2 text-right focus:outline-none focus:ring-1 focus:ring-orange-500"
+                        />
+                      </div>
+                    </div>
+                  </div>
+                  <div class="col-span-2">
+                    <div class="bg-gray-50 rounded-lg p-3">
+                      <div class="flex justify-between items-center">
+                        <span class="text-sm font-medium text-gray-700"
+                          >Total:</span
+                        >
+                        <span class="text-lg font-bold text-green-600">{{
+                          formatoMoneda(item.total ?? 0)
+                        }}</span>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <div
+                v-if="factura.detalle.length === 0"
+                class="bg-white border border-gray-200 rounded-lg p-6 text-center text-gray-500"
+              >
+                No hay productos agregados. Haz clic en "Agregar Producto" para
+                comenzar.
+              </div>
             </div>
 
             <button
               :disabled="!isNumber(factura.proveedor) || bloquearCampos"
               @click="agregarItem"
-              class="disabled:bg-slate-500 mt-4 flex items-center bg-orange-600 text-white px-4 py-2 rounded-lg hover:bg-orange-700 transition focus:outline-none focus:ring-2 focus:ring-orange-500 focus:ring-offset-2"
+              class="disabled:bg-slate-500 mt-4 flex items-center bg-orange-600 text-white px-4 py-2 rounded-lg hover:bg-orange-700 transition focus:outline-none focus:ring-2 focus:ring-orange-500 focus:ring-offset-2 w-full md:w-auto justify-center"
             >
               <svg
                 class="w-5 h-5 mr-2"
@@ -489,15 +653,31 @@
 
           <!-- Totales -->
           <div
-            class="class=p-6 flex flex-col items-end space-y-2 p-4 bg-gray-50 rounded-lg"
+            class="p-4 md:p-6 flex flex-col items-end space-y-2 bg-gray-50 rounded-lg mx-4 md:mx-6"
           >
             <div class="text-right">
               <p class="text-gray-700 text-lg">
-                Total:
+                Total Factura:
                 <span class="font-bold text-2xl text-green-600">
                   {{ formatoMoneda(totalFactura) }}
                 </span>
               </p>
+              <div
+                class="flex md:flex-row flex-col md:gap-4 gap-1 md:mt-2 border-t rounded-md p-0"
+              >
+                <p class="text-gray-700 text-sm">
+                  total sin iva:
+                  <span class="font-bold text-sm text-gray-500">
+                    {{ formatoMoneda(totalFacturaSinIva) }}
+                  </span>
+                </p>
+                <p class="text-gray-700 text-sm">
+                  iva:
+                  <span class="font-bold text-sm text-gray-500">
+                    {{ formatoMoneda(Iva) }}
+                  </span>
+                </p>
+              </div>
             </div>
             <p v-if="factura.detalle.length > 0" class="text-sm text-gray-500">
               {{ factura.detalle.length }} producto(s) · Impuestos incluidos
@@ -506,18 +686,18 @@
 
           <!-- Guardar -->
           <div
-            class="p-6 flex flex-col-reverse md:flex-row justify-end space-y-4 space-y-reverse md:space-y-0 md:space-x-4"
+            class="p-4 md:p-6 flex flex-col-reverse md:flex-row justify-end space-y-4 space-y-reverse md:space-y-0 md:space-x-4"
           >
             <button
               @click="limpiarFormulario"
-              class="px-6 py-2 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50 transition"
+              class="px-6 py-2 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50 transition w-full md:w-auto"
             >
               Limpiar
             </button>
             <button
               @click="guardarFactura"
               :disabled="guardando || bloquearCampos"
-              class="disabled:bg-slate-600 flex items-center justify-center bg-green-600 text-white px-6 py-2 rounded-lg hover:bg-green-700 transition focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-2"
+              class="disabled:bg-slate-600 flex items-center justify-center bg-green-600 text-white px-6 py-2 rounded-lg hover:bg-green-700 transition focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-2 w-full md:w-auto"
             >
               <svg
                 v-if="guardando"
@@ -543,26 +723,30 @@
                 guardando
                   ? 'Procesando...'
                   : editar
-                    ? 'Actulizar Factura'
+                    ? 'Actualizar Factura'
                     : 'Guardar Factura'
               }}
             </button>
           </div>
         </div>
-        <div v-if="tab === 'HFactura'" class="p-6">
-          <div class="flex justify-between items-center mb-6">
-            <h2 class="text-xl font-semibold text-gray-900">
+
+        <!-- Historial de Facturas -->
+        <div v-if="tab === 'HFactura'" class="p-4 md:p-6">
+          <div
+            class="flex flex-col md:flex-row justify-between items-start md:items-center mb-6 space-y-4 md:space-y-0"
+          >
+            <h2 class="text-lg md:text-xl font-semibold text-gray-900">
               Historial de Facturas
             </h2>
-
-            <!-- Filtros -->
-            <div class="flex items-center space-x-4">
-              <div class="relative">
+            <div
+              class="flex flex-col md:flex-row items-start md:items-center space-y-2 md:space-y-0 md:space-x-4 w-full md:w-auto"
+            >
+              <div class="relative w-full md:w-64">
                 <input
                   v-model="filtroBusqueda"
                   type="text"
                   placeholder="Buscar por número o serie..."
-                  class="pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent"
+                  class="pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent w-full"
                 />
                 <svg
                   class="w-5 h-5 text-gray-400 absolute left-3 top-1/2 transform -translate-y-1/2"
@@ -578,10 +762,9 @@
                   ></path>
                 </svg>
               </div>
-
               <select
                 v-model="filtroEstado"
-                class="px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent"
+                class="px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent w-full md:w-auto"
               >
                 <option value="">Todos los estados</option>
                 <option
@@ -595,8 +778,10 @@
             </div>
           </div>
 
-          <!-- Tabla de Historial -->
-          <div class="bg-white rounded-lg shadow overflow-hidden">
+          <!-- Versión Desktop - Tabla -->
+          <div
+            class="hidden md:block bg-white rounded-lg shadow overflow-hidden"
+          >
             <table class="min-w-full divide-y divide-gray-200">
               <thead class="bg-gray-50">
                 <tr>
@@ -716,7 +901,7 @@
                     <button
                       @click="borrarFactura(factura)"
                       class="text-red-600 hover:text-red-800 mr-3"
-                      title="Ver detalle"
+                      title="Eliminar"
                     >
                       <svg
                         class="w-5 h-5"
@@ -753,8 +938,6 @@
                     </button>
                   </td>
                 </tr>
-
-                <!-- Mensaje cuando no hay resultados -->
                 <tr v-if="facturasFiltradas.length === 0">
                   <td
                     colspan="8"
@@ -765,6 +948,146 @@
                 </tr>
               </tbody>
             </table>
+          </div>
+
+          <!-- Versión Mobile - Cards -->
+          <div class="md:hidden space-y-4">
+            <div
+              v-for="factura in facturasFiltradas"
+              :key="factura.id"
+              class="bg-white border border-gray-200 rounded-lg p-4 shadow-sm"
+            >
+              <div class="flex justify-between items-start mb-3">
+                <div>
+                  <h3 class="text-lg font-semibold text-gray-900">
+                    #{{ factura.numero }}
+                  </h3>
+                  <p class="text-sm text-gray-500">
+                    Serie: {{ factura.serie }}
+                  </p>
+                </div>
+                <span
+                  :class="[
+                    'px-2 py-1 text-xs font-semibold rounded-full',
+                    factura.id_estado_factura === 1
+                      ? 'bg-green-100 text-green-800'
+                      : factura.id_estado_factura === 2
+                        ? 'bg-yellow-100 text-yellow-800'
+                        : 'bg-red-100 text-red-800',
+                  ]"
+                >
+                  {{ obtenerEstadoFactura(factura.id_estado_factura) }}
+                </span>
+              </div>
+              <div class="space-y-2 mb-4">
+                <div class="flex justify-between">
+                  <span class="text-sm font-medium text-gray-500"
+                    >Proveedor:</span
+                  >
+                  <span class="text-sm text-gray-900">{{
+                    obtenerNombreProveedor(factura.proveedor)
+                  }}</span>
+                </div>
+                <div class="flex justify-between">
+                  <span class="text-sm font-medium text-gray-500">Fecha:</span>
+                  <span class="text-sm text-gray-900">{{
+                    formatoFecha(factura.fecha)
+                  }}</span>
+                </div>
+                <div class="flex justify-between">
+                  <span class="text-sm font-medium text-gray-500"
+                    >Tipo Pago:</span
+                  >
+                  <span class="text-sm text-gray-900">{{
+                    obtenerTipoPago(factura.id_tipo_pago)
+                  }}</span>
+                </div>
+                <div class="flex justify-between">
+                  <span class="text-sm font-medium text-gray-500"
+                    >Productos:</span
+                  >
+                  <span
+                    class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800"
+                  >
+                    {{ factura.detalle ? factura.detalle.length : 0 }} productos
+                  </span>
+                </div>
+              </div>
+              <div class="flex justify-between pt-3 border-t border-gray-200">
+                <button
+                  @click="verDetalleFactura(factura)"
+                  class="flex items-center text-orange-600 hover:text-orange-800 text-sm font-medium"
+                  title="Ver detalle"
+                >
+                  <svg
+                    class="w-4 h-4 mr-1"
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                  >
+                    <path
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                      stroke-width="2"
+                      d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"
+                    ></path>
+                    <path
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                      stroke-width="2"
+                      d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"
+                    ></path>
+                  </svg>
+                  Ver
+                </button>
+                <button
+                  @click="borrarFactura(factura)"
+                  class="flex items-center text-red-600 hover:text-red-800 text-sm font-medium"
+                  title="Eliminar"
+                >
+                  <svg
+                    class="w-4 h-4 mr-1"
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                  >
+                    <path
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                      stroke-width="2"
+                      d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"
+                    ></path>
+                  </svg>
+                  Eliminar
+                </button>
+                <button
+                  @click="descargarFactura(factura)"
+                  class="flex items-center text-green-600 hover:text-green-800 text-sm font-medium"
+                  title="Descargar"
+                >
+                  <svg
+                    class="w-4 h-4 mr-1"
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                  >
+                    <path
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                      stroke-width="2"
+                      d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"
+                    ></path>
+                  </svg>
+                  Descargar
+                </button>
+              </div>
+            </div>
+            <div
+              v-if="facturasFiltradas.length === 0"
+              class="bg-white border border-gray-200 rounded-lg p-6 text-center text-gray-500"
+            >
+              No se encontraron facturas
+            </div>
           </div>
 
           <!-- Paginación -->
@@ -863,6 +1186,35 @@
                 </nav>
               </div>
             </div>
+            <div class="sm:hidden flex items-center justify-between w-full">
+              <div class="flex-1 flex justify-between items-center">
+                <button
+                  @click="paginaActual--"
+                  :disabled="paginaActual === 1"
+                  :class="[
+                    'relative inline-flex items-center px-3 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50',
+                    paginaActual === 1 ? 'opacity-50 cursor-not-allowed' : '',
+                  ]"
+                >
+                  Anterior
+                </button>
+                <span class="text-sm text-gray-700"
+                  >Página {{ paginaActual }} de {{ paginasTotales }}</span
+                >
+                <button
+                  @click="paginaActual++"
+                  :disabled="paginaActual === paginasTotales"
+                  :class="[
+                    'relative inline-flex items-center px-3 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50',
+                    paginaActual === paginasTotales
+                      ? 'opacity-50 cursor-not-allowed'
+                      : '',
+                  ]"
+                >
+                  Siguiente
+                </button>
+              </div>
+            </div>
           </div>
         </div>
       </div>
@@ -919,6 +1271,7 @@ export default {
       estadosFactura: [],
       editar: false,
       bloquearCampos: false,
+      iva: 0,
       tabs: [
         { id: 'IFactura', label: 'Ingreso Factura', icon: TypeIcon },
         { id: 'HFactura', label: 'Historial Facturas', icon: OfferIcon },
@@ -948,11 +1301,23 @@ export default {
     };
   },
   computed: {
-    totalFactura() {
+    totalFacturaSinIva() {
+      // Subtotal sin IVA
       return this.factura.detalle.reduce(
-        (acc, item) => acc + item.cantidad * item.precio - item.descuento,
+        (acc, item) => acc + (item.cantidad * item.precio - item.descuento),
         0
       );
+    },
+
+    Iva() {
+      // Solo el IVA calculado sobre el subtotal
+      const subtotal = this.totalFacturaSinIva;
+      return subtotal * (this.iva / 100);
+    },
+
+    totalFactura() {
+      // Total general (subtotal + IVA)
+      return this.totalFacturaSinIva + this.Iva;
     },
     facturasFiltradas() {
       let filtered = this.historialFacturas;
@@ -1511,12 +1876,13 @@ export default {
       return valido;
     },
     async guardarFactura() {
-      if (!this.validarFormulario()) return;
+      if (!this.validarFormulario())
+        return this.mostrarAlertaError('Valide los campos señalados');
 
       this.guardando = true;
 
       try {
-        this.factura.total = this.totalFactura;
+        this.factura.total = this.totalFacturaSinIva;
         console.log('Factura guardada:', this.factura);
         const factura = await api.v1.inventario.agregarMovimientoProducto(
           this.factura
@@ -1588,7 +1954,8 @@ export default {
     },
     async obtenerEstadosFactura() {
       try {
-        const estadosFact = await api.v1.inventario.obtenerEstadosFactura();
+        const estadosFact =
+          await api.v1.inventario.obtenerEstadosFactura('FacturaProveedor');
         this.estadosFactura = estadosFact.data.estadosFactura;
       } catch (error) {
         console.log(error);
@@ -1612,8 +1979,19 @@ export default {
       this.obtenerMetodosDePago();
       this.obtenerProveedores();
     },
+    async obtenerIva() {
+      try {
+        const ivaResponse =
+          await api.v1.opcionesGenerales.obtenerPorcentajeIva();
+        this.iva = Number(ivaResponse.data.iva);
+      } catch (error) {
+        console.log(error);
+        this.mostrarAlertaError('Error al obtener el IVA');
+      }
+    },
   },
   mounted() {
+    this.obtenerIva();
     this.cargarBotonesModal();
     this.cargarHistorialFacturas();
     this.obtenerDatosIniciales();

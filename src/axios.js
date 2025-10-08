@@ -54,6 +54,19 @@ api.v1 = {
       api.post('/v1/venta/actualizarEstadoPedido', data),
     obtenerProductosParaCompra: () =>
       api.get('/v1/venta/obtenerProductosParaCompra'),
+    obtenerConsidenciasCorreo: (correo) =>
+      api.get('/v1/venta/obtenerConsidenciasCorreo', { params: { correo } }),
+    obtenerClientePorCorreo: (correo) =>
+      api.get('/v1/venta/obtenerClientePorCorreo', { params: { correo } }),
+    clienteDebeActualizar: (correo) =>
+      api.get('/v1/venta/clienteDebeActualizar', { params: { correo } }),
+    obtenerPedidosPorNumero: (numero_pedido) =>
+      api.get('/v1/venta/obtenerPedidosPorNumero', {
+        params: { numero_pedido },
+      }),
+    crearFacturaCliente: (data) =>
+      api.post('/v1/venta/crearFacturaCliente', data),
+    obtenerFacturasClientes: () => api.get('/v1/venta/obtenerFacturasClientes'),
   },
   inventario: {
     ObtenerProveedores: () => api.get('/v1/inventario/ObtenerProveedores'),
@@ -101,8 +114,8 @@ api.v1 = {
       api.post('/v1/inventario/agregarOfertaProducto', data),
     borrarProductoOferta: (id_producto_oferta) =>
       api.delete(`/v1/inventario/borrarProductoOferta/${id_producto_oferta}`),
-    obtenerEstadosFactura: () =>
-      api.get('/v1/inventario/obtenerEstadosFactura'),
+    obtenerEstadosFactura: (filtro) =>
+      api.get('/v1/inventario/obtenerEstadosFactura', { params: { filtro } }),
     obtenerTiposPago: () => api.get('/v1/inventario/obtenerTiposPago'),
     obtenerProductosPorProveedor: (proveedor) =>
       api.get('/v1/inventario/obtenerProductosPorProveedor', {
@@ -114,6 +127,33 @@ api.v1 = {
       api.post('/v1/inventario/agregarMovimientoProducto', data),
     borrarFacturayDetalle: (id_factura) =>
       api.delete(`/v1/inventario/borrarFacturayDetalle/${id_factura}`),
+  },
+  opcionesGenerales: {
+    obtenerPais: () => api.get('/v1/opcionesGenerales/obtenerPais'),
+    obtenerDepartamento: (idPais) =>
+      api.get('/v1/opcionesGenerales/obtenerDepartamento', {
+        params: { idPais },
+      }),
+    obtenerMunicipio: (departamentoId) =>
+      api.get('/v1/opcionesGenerales/obtenerMunicipio', {
+        params: { departamentoId },
+      }),
+    obtenerTiposIdentificacion: () =>
+      api.get('/v1/opcionesGenerales/obtenerTiposIdentificacion'),
+    crearDireccion: (data) =>
+      api.post('/v1/opcionesGenerales/crearDireccion', data),
+    obtenerEstadotelefono: () =>
+      api.get('/v1/opcionesGenerales/obtenerEstadotelefono'),
+    obtenerPorcentajeIva: () =>
+      api.get('/v1/opcionesGenerales/obtenerPorcentajeIva'),
+  },
+  cliente: {
+    actualizarCliente: (data) =>
+      api.post('/v1/cliente/actualizarCliente', data),
+    crearDocumentoIdentificacion: (data) =>
+      api.post('/v1/cliente/crearDocumentoIdentificacion', data),
+    crearTelefonosContacto: (data) =>
+      api.post('/v1/cliente/crearTelefonosContacto', data),
   },
 };
 api.interceptors.request.use(

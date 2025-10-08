@@ -37,7 +37,7 @@
     </header>
 
     <!-- Main Content -->
-    <main class="m-5 md:m-10   ">
+    <main class="m-5 md:m-10">
       <!-- Welcome Section -->
       <section class="mb-8">
         <div class="bg-white rounded-2xl shadow-sm p-6 border">
@@ -59,6 +59,7 @@
                 Gestiona tus compras facil y rapido
               </p>
             </div>
+
             <div class="hidden md:block">
               <div
                 class="w-16 h-16 bg-gradient-to-r from-blue-400 to-indigo-600 rounded-full flex items-center justify-center"
@@ -81,13 +82,39 @@
           </div>
         </div>
       </section>
+      <div v-if="usuarioCliente && !datos_actualizados" class="w-full">
+        <div role="alert" class="w-full animate-pulse alert alert-warning">
+          <svg
+            class="h-6 w-full stroke-current"
+            fill="none"
+            viewBox="0 0 24 24"
+          >
+            <path
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              stroke-width="2"
+              d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"
+            />
+          </svg>
+          <a
+            @click="$router.push('/ActualizacionCliente')"
+            class="cursor-pointer md:text-lg text-black underline"
+            >Actualiza tus datos!</a
+          >
+          <p class="text-sm text-black">
+            Actualizar tus datos nos ayudara a poder gestionar de mejor manera
+            tus pedidos
+          </p>
+        </div>
+      </div>
 
       <!-- Stats Cards -->
       <section
         v-if="!usuarioCliente"
         class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8"
+        id="resumen"
       >
-        <div class="bg-white rounded-xl shadow-sm ">
+        <div class="bg-white rounded-xl shadow-sm">
           <div class="flex items-center">
             <div class="py-10 px-5 bg-blue-100 rounded-lg">
               <svg
@@ -113,7 +140,7 @@
           </div>
         </div>
 
-        <div class=" bg-white rounded-xl shadow-sm ">
+        <div class="bg-white rounded-xl shadow-sm">
           <div class="flex items-center">
             <div class="py-10 px-4 bg-green-100 rounded-lg">
               <svg
@@ -139,7 +166,7 @@
           </div>
         </div>
 
-        <div class="bg-white rounded-xl shadow-sm ">
+        <div class="bg-white rounded-xl shadow-sm">
           <div class="flex items-center">
             <div class="py-10 px-5 bg-yellow-100 rounded-lg">
               <svg
@@ -165,7 +192,7 @@
           </div>
         </div>
 
-        <div class="bg-white rounded-xl shadow-sm ">
+        <div class="bg-white rounded-xl shadow-sm">
           <div class="flex items-center">
             <div class="py-10 px-5 bg-red-100 rounded-lg">
               <svg
@@ -204,7 +231,7 @@
         </div>
 
         <!-- Recent Activity / Content Section -->
-        <div v-if="!usuarioCliente" class="lg:col-span-2">
+        <div v-if="!usuarioCliente" class="lg:col-span-2" id="movimientos">
           <div class="bg-white rounded-2xl shadow-sm p-6 border">
             <div class="flex items-center justify-between mb-6">
               <h3 class="text-lg font-semibold text-gray-900">
@@ -275,19 +302,39 @@
         </div>
       </div>
     </footer>
+    <Modal
+      v-model:abierto="modalAbierto"
+      :titulo="'Opciones de Ayuda'"
+      :botones="botonesModal"
+      orientacion="vertical"
+      @accion="handleAccion"
+    >
+      <template #contenido>
+        <p class="text-gray-600 text-sm mb-2"></p>
+      </template>
+    </Modal>
   </div>
 </template>
 
 <script>
+import Modal from '../components/modal.vue';
 import { useAuthStore } from '../stores/auth';
 import { api } from '../axios';
+import { useUiStore } from '../stores/uiStore';
+import { watch, onBeforeUnmount } from 'vue';
+const uiStore = useUiStore();
+let stopWatch;
+
 import { mostrarAlertaGlobal } from '../components/contenedorDeAlertas.vue';
 
 export default {
   name: 'Inicio',
-
+  components: { Modal },
   data() {
     return {
+      datos_actualizados: true,
+      modalAbierto: false,
+      botonesModal: [],
       usuarioCliente: false,
       resumen: {
         cantidad_productos: 0,
@@ -304,13 +351,133 @@ export default {
       return useAuthStore();
     },
   },
-
-  mounted() {
-    const usuario = JSON.parse(localStorage.getItem('usuario'));
-    if (usuario.rol === 'CLIENTE') this.usuarioCliente = true;
-    this.realizarCargaInicial();
+  beforeUnmount() {
+    if (stopWatch) stopWatch();
   },
+  mounted() {
+    this.tutorialInicialDiver();
+    this.$nextTick(() => {
+      stopWatch = watch(
+        () => uiStore.botonPresionado,
+        (nuevo) => {
+          if (nuevo) {
+            this.modalAbierto = true;
+          }
+        }
+      );
+    });
+
+    const usuario = JSON.parse(localStorage.getItem('usuario'));
+    if (usuario.rol === 'CLIENTE') {
+      this.usuarioCliente = true;
+      this.clienteDebeActualizar(usuario.correo);
+    }
+    this.realizarCargaInicial();
+    this.cargarBotonesModal();
+  },
+
   methods: {
+    tutorialInicialDiver() {
+      const driverObj = this.$driver({
+        animate: true,
+        showProgress: true,
+        showButtons: ['next', 'previous'],
+        steps: [
+          {
+            popover: {
+              title: 'Bievenido a Mini Inventario',
+              description:
+                'Administra tu inventario fácilmente. Usa "Next" para avanzar o "Previous" para retroceder.',
+              side: 'left',
+              align: 'start',
+            },
+          },
+          {
+            element: '#resumen',
+            popover: {
+              title: 'Ve un corto resumen de tu inventario',
+              description:
+                'En esta seccion puedes ver cuantos productos estan en stock, cuantos estan agotados y cuantos estan por agotarse',
+              side: 'bottom',
+              align: 'start',
+            },
+          },
+          {
+            element: '#movimientos',
+            popover: {
+              title: 'Ve los movimientos recientes',
+              description:
+                'aqui puedes ver los movimientos recientes de tu inventario, quien hizo el movimiento y que producto se vio afectado',
+              side: 'bottom',
+              align: 'start',
+            },
+          },
+          {
+            popover: {
+              title: 'El ayudante de pasos estara contigo',
+              description:
+                'Siempre que tengas dudas de un modulo, busca el icono de ayuda en la esquina inferior derecha, y el te guiara paso a paso, !Buena suerte¡, a por cierto solo estara disponible en tu computadora no disponible en movil',
+              side: 'left',
+              align: 'start',
+            },
+          },
+          {
+            element: '#botonAyuda',
+            popover: {
+              title: '¡¡Estoy aqui!!',
+              description: 'Clickea aqui',
+              side: 'top',
+              align: 'start',
+            },
+          },
+        ],
+      });
+      driverObj.drive();
+    },
+    handleAccion(valor) {
+      if (valor.botonEjectuado === 'inicio') {
+        this.tutorialInicialDiver();
+      } else if (valor.botonEjectuado === 'siguiente') {
+        this.$router.push('/Proveedores');
+      }
+    },
+    cargarBotonesModal() {
+      this.botonesModal = [
+        {
+          texto: 'Inicar tutorial de nuevo',
+          color: 'bg-secondary',
+          mostrar: true,
+          botonEjectuado: 'inicio',
+          hoverColor: 'hover:bg-yellow-600',
+          textColor: 'text-white',
+          icon: null,
+          size: 'base',
+          fullWidth: true,
+          accion: () => null,
+        },
+        {
+          texto: 'Ir a la siguiente pagina',
+          botonEjectuado: 'siguiente',
+          color: 'bg-gray-200', // gris neutro
+          mostrar: true,
+          hoverColor: 'hover:bg-gray-400',
+          textColor: 'text-gray-800', // texto más oscuro pero menos llamativo
+          icon: null,
+          size: 'base',
+          fullWidth: true,
+          accion: () => null,
+        },
+      ];
+    },
+    async clienteDebeActualizar(correo) {
+      try {
+        const apiActualizacion =
+          await api.v1.venta.clienteDebeActualizar(correo);
+        this.datos_actualizados = apiActualizacion.data.datos_actualizados;
+      } catch (error) {
+        console.error('Error al obtner actualizacion');
+      }
+    },
     async realizarCargaInicial() {
       await this.obtenerLogs();
       await this.obtenerResumenProductos();

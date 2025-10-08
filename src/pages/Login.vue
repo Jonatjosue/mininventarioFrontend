@@ -213,7 +213,6 @@ export default {
       ];
     },
     handleAccion(btn) {
-      console.log('Botón presionado:', btn.texto);
       if (btn.botonEjectuado === 'inicio') {
         this.$router.push('/');
       } else if (btn.botonEjectuado === 'restablecer') {

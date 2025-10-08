@@ -22,6 +22,17 @@ function cargarRutasInicioPublicasConAuth() {
         allowed: true,
       },
     },
+    {
+      path: '/ActualizacionCliente',
+      name: 'Actualizar Datos',
+      meta: {
+        group: 'Perfil',
+        title: 'Perfil',
+        icon: 'Home',
+        requiresAuth: true,
+        allowed: true,
+      },
+    },
     /*   {
       path: '/IngresoPedidos',
       name: 'Pedidos',

@@ -1,5 +1,5 @@
 <template>
-  <div class="min-h-screen bg-gradiente-personal from-gray-50 to-blue-100 p-4">
+  <div class="bg-gradiente-personal from-gray-50 to-blue-100 p-4">
     <!-- Header -->
     <header class="bg-white shadow-sm rounded-lg mb-6">
       <div class="max-w-7xl mx-auto px-4 py-4 sm:px-6 lg:px-8">
@@ -622,13 +622,13 @@
                     </td>
                     <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
                       <button
-                        @click="editarProducto(index)"
+                        @click="editarProducto(producto.p_producto_Id)"
                         class="text-blue-600 hover:text-blue-900 mr-3"
                       >
                         Editar
                       </button>
                       <button
-                        @click="eliminarProducto(index)"
+                        @click="eliminarProducto(producto.p_producto_Id)"
                         class="text-red-600 hover:text-red-900"
                       >
                         Eliminar
@@ -744,13 +744,13 @@
 
                 <div class="flex space-x-2 pt-3 border-t border-gray-100">
                   <button
-                    @click="editarProducto(index)"
+                    @click="editarProducto(producto.p_producto_Id)"
                     class="flex-1 bg-blue-50 text-blue-600 px-3 py-2 rounded text-sm font-medium hover:bg-blue-100 transition"
                   >
                     Editar
                   </button>
                   <button
-                    @click="eliminarProducto(index)"
+                    @click="eliminarProducto(producto.p_producto_Id)"
                     class="flex-1 bg-red-50 text-red-600 px-3 py-2 rounded text-sm font-medium hover:bg-red-100 transition"
                   >
                     Eliminar
@@ -1568,7 +1568,31 @@
               <div>
                 <p class="text-black">Aplicar por:</p>
               </div>
-
+              <div
+                class="font-extralight flex flex-row gap-1 text-sm text-gray-700"
+              >
+                {{ '(' }}
+                <p
+                  v-if="!aplica_por_porcentaje"
+                  class="font-extralight text-sm text-gray-700"
+                >
+                  Q{{
+                    ofertaSeleccionada.valor_oferta_numerico.toLocaleString(
+                      'en-US',
+                      {
+                        minimumFractionDigits: 2,
+                        maximumFractionDigits: 2,
+                      }
+                    )
+                  }}
+                </p>
+                <p v-else class="font-extralight text-sm text-gray-700">
+                  <span class="font-extralight text-sm text-gray-700">
+                    {{ ofertaSeleccionada.valor_oferta_porcentaje + '%' }}
+                  </span>
+                </p>
+                {{ ')' }}
+              </div>
               <label
                 class="relative inline-flex items-center cursor-pointer my-2"
               >
@@ -2267,13 +2291,17 @@ export default {
     async eliminarProducto(index) {
       if (confirm('¿Estás seguro de que quieres eliminar este producto?')) {
         try {
-          const productoEliminado = this.productos[index];
+          const productoEliminado = this.productos.find(
+            (a) => a.p_producto_Id === index
+          );
           const elimarProducto = await api.v1.inventario.borrarProducto(
             productoEliminado.p_producto_Id
           );
           if (elimarProducto.data.mensaje !== 'Producto eliminado')
             return this.mostrarAlertaError('Error al eliminar producto');
-          this.productos.splice(index, 1);
+          this.productos = this.productos.filter(
+            (a) => a.p_producto_Id !== productoEliminado.p_producto_Id
+          );
           this.mostrarAlertaExito(`"${productoEliminado.nombre}" eliminado`);
         } catch (error) {
           this.mostrarAlertaError('Error al eliminar producto');
@@ -2283,7 +2311,10 @@ export default {
 
     editarProducto(index) {
       this.edicionActiva = true;
-      const productoEdicion = { ...this.productos[index] };
+      console.log(index);
+      const productoEdicion = this.productos.find(
+        (a) => a.p_producto_Id === index
+      );
       this.nuevoProducto = {
         p_producto_Id: productoEdicion.p_producto_Id,
         nombre: productoEdicion.nombre,
