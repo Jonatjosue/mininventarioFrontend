@@ -833,7 +833,7 @@ export default {
     },
     calcularPrecioConDescuento(producto) {
       if (producto.descuento) {
-        return producto.precio * (1 - producto.descuento / 100);
+        return producto.precio - producto.descuento;
       }
       return producto.precio;
     },

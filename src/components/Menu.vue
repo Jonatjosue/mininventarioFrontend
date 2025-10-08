@@ -233,6 +233,7 @@ export default {
     setTimeout(() => {
       this.mostrarMensajeYBounce = true;
     }, 2000);
+    this.abierto = false;
   },
   beforeUnmount() {
     if (this.debouncedCheckViewport) {

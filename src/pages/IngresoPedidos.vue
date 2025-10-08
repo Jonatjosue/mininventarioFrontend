@@ -34,6 +34,29 @@
                 }}
               </p>
             </div>
+            <div
+              v-if="!datos_actualizados"
+              role="alert"
+              class="animate-pulse alert alert-warning"
+            >
+              <svg
+                class="h-6 w-6 stroke-current"
+                fill="none"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  stroke-width="2"
+                  d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"
+                />
+              </svg>
+              <a
+                @click="$router.push('/ActualizacionCliente')"
+                class="cursor-pointer text-sm"
+                >Actualiza tus datos!</a
+              >
+            </div>
           </div>
         </div>
       </div>
@@ -1138,30 +1161,6 @@
         </div>
       </div>
     </div>
-
-    <!-- Notificación Toast -->
-    <div
-      v-if="mostrarNotificacion"
-      class="fixed top-4 right-4 bg-green-500 text-white px-6 py-3 rounded-lg shadow-lg transform transition-transform duration-300 z-50"
-      :class="notificacionClase"
-    >
-      <div class="flex items-center space-x-2">
-        <svg
-          class="w-5 h-5"
-          fill="none"
-          stroke="currentColor"
-          viewBox="0 0 24 24"
-        >
-          <path
-            stroke-linecap="round"
-            stroke-linejoin="round"
-            stroke-width="2"
-            d="M5 13l4 4L19 7"
-          ></path>
-        </svg>
-        <span>{{ mensajeNotificacion }}</span>
-      </div>
-    </div>
   </div>
 </template>
 
@@ -1245,10 +1244,10 @@ export default {
       filtroProductos: '',
       mostrarModalProductos: false,
       mostrarModalDetalle: false,
+      datos_actualizados: true,
       pedidoSeleccionado: {},
       guardando: false,
       mostrarNotificacion: false,
-      mensajeNotificacion: '',
       tabs: [
         { id: 'nuevo', label: 'Nuevo Pedido', icon: NewOrderIcon },
         { id: 'historial', label: 'Historial', icon: HistoryIcon, count: 0 },
@@ -1382,9 +1381,6 @@ export default {
         0
       );
     },
-    notificacionClase() {
-      return this.mostrarNotificacion ? 'translate-x-0' : 'translate-x-full';
-    },
   },
   mounted() {
     this.cargarProductos();
@@ -1401,8 +1397,8 @@ export default {
         email: usuario.correo,
         esEmpleado: false,
       };
+      this.clienteDebeActualizar(usuario.correo);
     }
-
     const carrito = JSON.parse(this.$route.query.carrito || '[]');
     carrito.forEach((a) => {
       const productoDesdeCarrito = {
@@ -1416,6 +1412,15 @@ export default {
     });
   },
   methods: {
+    async clienteDebeActualizar(correo) {
+      try {
+        const apiActualizacion =
+          await api.v1.venta.clienteDebeActualizar(correo);
+        this.datos_actualizados = apiActualizacion.data.datos_actualizados;
+      } catch (error) {
+        console.error('Error al obtner actualizacion');
+      }
+    },
     formatearFechaHoraEntrega(fecha, hora) {
       return formatearFechaHoraEntrega(fecha, hora);
     },
@@ -1637,14 +1642,6 @@ export default {
           return v.toString(16);
         }
       );
-    },
-    mostrarNotificacion(mensaje, tipo) {
-      this.mensajeNotificacion = mensaje;
-      this.mostrarNotificacion = true;
-
-      setTimeout(() => {
-        this.mostrarNotificacion = false;
-      }, 3000);
     },
   },
 };
